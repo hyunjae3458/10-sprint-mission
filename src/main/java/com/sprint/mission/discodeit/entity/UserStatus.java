@@ -17,8 +17,8 @@ public class UserStatus extends BaseEntity{
     }
 
     // 최신 접속 시간 갱신
-    public void updateAccessTime(){
-        this.lastOnlineAt = Instant.now();
+    public void updateAccessTime(Instant newLastActivateAt){
+        this.lastOnlineAt = newLastActivateAt;
     }
 
 }

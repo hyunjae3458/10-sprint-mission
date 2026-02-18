@@ -1,31 +1,28 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponsePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponsePublicDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class ChannelMapper {
-    public ChannelResponseDto toPublicDto(Channel channel){
+    private final MessageService messageService;
+    public ChannelDto toDto(Channel channel){
         if(channel == null) return null;
 
-        return new ChannelResponsePublicDto(channel.getId(),
+        return new ChannelDto(channel.getId(),
                 channel.getChannelName(),
-                channel.getMessageList(),
+                channel.getDescription(),
                 channel.getUserList(),
-                channel.getChannelType());
-    }
-
-    public ChannelResponseDto toPrivateDto(Channel channel){
-        if(channel == null) return null;
-
-        return new ChannelResponsePrivateDto(channel.getId(),
-                channel.getChannelName(),
-                channel.getUserList(),
-                channel.getMessageList(),
+                messageService.findLatestMessageByChannelId(channel.getId()),
                 channel.getChannelType());
     }
 }

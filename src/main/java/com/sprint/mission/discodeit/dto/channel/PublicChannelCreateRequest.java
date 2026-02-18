@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-public class ChannelCreateDto {
-    private String channelName;
-    private List<UUID> userList = new ArrayList<>();
+public class PublicChannelCreateRequest {
+    private String name;
+    private String description;
 }

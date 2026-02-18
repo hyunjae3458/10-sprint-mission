@@ -32,6 +32,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public Optional<Message> findLatestByChannelId(UUID channelId) {
+
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .findFirst();
+    }
+
+    @Override
     public void save(Message message) {
         data.put(message.getId(),message);
     }

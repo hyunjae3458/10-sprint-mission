@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -98,6 +99,13 @@ public class BasicMessageService implements MessageService {
         messageList.forEach(System.out::println);
 
         return messageList;
+    }
+
+    @Override
+    public Instant findLatestMessageByChannelId(UUID channelId) {
+        Message message = messageRepository.findLatestByChannelId(channelId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시자가 없습니다."));
+        return message.getCreatedAt();
     }
 
     @Override

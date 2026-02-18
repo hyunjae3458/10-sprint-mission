@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
@@ -30,23 +30,21 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
 
     @Override
-    public UserResponseDto create(UserCreateDto dto) {
+    public UserDto create(UserCreateRequest request, MultipartFile profile) {
         // 유저 객체 생성
-        User user = new User(dto.getName(),
-                dto.getEmail(),
-                dto.getPassword());
+        User user = new User(request.getName(),
+                request.getEmail(),
+                request.getPassword());
 
-        // 유저 dto 내부 받아온 파일 dto
-        MultipartFile file = dto.getProfileImg();
         // 프로필 등록 여부 & binaryContent객체 생성
-        if(file != null){
+        if(profile != null){
             try{
                 BinaryContent binaryContent =
                         new BinaryContent(user.getId(),
                                 null,
-                                file.getBytes(),
-                                file.getOriginalFilename(),
-                                file.getContentType());
+                                profile.getBytes(),
+                                profile.getOriginalFilename(),
+                                profile.getContentType());
                 // binarycontent 저장
                 binaryContentRepository.save(binaryContent);
                 // 연관성 주입
@@ -66,7 +64,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto findUser(UUID userId) {
+    public UserDto findUser(UUID userId) {
         User user = getUser(userId);
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("해당 사용자 상태가 없습니다."));
@@ -81,12 +79,12 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserResponseDto> findAllUsers() {
+    public List<UserDto> findAllUsers() {
         List<User> userList = new ArrayList<>(userRepository.findAll());
         // 유저 상태들을 유저 아이디를 키로한 맵으로 가져옴
         Map<UUID, UserStatus> userStatusMap = userStatusRepository.findAll();
         // 가져온 객체들을 dto로 변환
-        List<UserResponseDto> dtoList = userList.stream()
+        List<UserDto> dtoList = userList.stream()
                 .map(user -> {
                     boolean online = userStatusRepository.findByUserId(user.getId())
                                             .map(UserStatus::getLastOnlineAt)
@@ -102,7 +100,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto addFriend(UUID senderId, UUID receiverId) {
+    public UserDto addFriend(UUID senderId, UUID receiverId) {
         User sender = getUser(senderId);
         User receiver = getUser(receiverId);
 
@@ -115,10 +113,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserResponseDto> findFriends(UUID userId) {
+    public List<UserDto> findFriends(UUID userId) {
         User user = getUser(userId);
 
-        List<UserResponseDto> friendList = user.getFriendsList().stream()
+        List<UserDto> friendList = user.getFriendsList().stream()
                 .map(this::findUser)
                 .filter(Objects::nonNull).toList();
 
@@ -128,23 +126,22 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UUID userId, UserUpdateDto dto) {
+    public UserDto update(UUID userId, UserUpdateRequest request, MultipartFile profile) {
         User user = getUser(userId);
         // 이름 수정
-        if(dto.getName() != null){
-            user.updateName(dto.getName());
+        if(request.getNewUsername() != null){
+            user.updateName(request.getNewUsername());
         }
         // 이메일 수정
-        if(dto.getEmail() != null){
-            user.updateEmail(dto.getEmail());
+        if(request.getNewEamil() != null){
+            user.updateEmail(request.getNewEamil());
         }
         // 비밀번호 수정
-        if(dto.getPassword() != null){
-            user.updatePassword(dto.getPassword());
+        if(request.getNewPassword() != null){
+            user.updatePassword(request.getNewPassword());
         }
         // 프로필 수정(기존에 있던 binaryContent를 삭제하고 업데이트 dto에 있는 binaryContent를 생성
-        if(dto.getProfileImg() != null){
-            MultipartFile newProfileImg = dto.getProfileImg();
+        if(profile != null){
 
             UUID oldProfileImageId = user.getProfileImageId();
             if(oldProfileImageId != null){
@@ -153,9 +150,9 @@ public class BasicUserService implements UserService {
             try{
                 BinaryContent newBinaryContent = new BinaryContent(user.getId(),
                         null,
-                        newProfileImg.getBytes(),
-                        newProfileImg.getOriginalFilename(),
-                        newProfileImg.getContentType());
+                        profile.getBytes(),
+                        profile.getOriginalFilename(),
+                        profile.getContentType());
                 binaryContentRepository.save(newBinaryContent);
 
                 user.updateProfileImg(newBinaryContent.getId());
@@ -170,9 +167,9 @@ public class BasicUserService implements UserService {
     }
 
 
-    public void updateOnlineStatus(UUID userId){
+    public void updateOnlineStatus(UUID userId, UserStatusUpdateRequest request){
         User user = getUser(userId);
-        userStatusService.update(userId);
+        userStatusService.update(userId,request);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
@@ -56,11 +57,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto update(UUID userId) {
+    public UserStatusResponseDto update(UUID userId, UserStatusUpdateRequest request) {
         // 수정할 객체 불러옴
         UserStatus userStatus = getUserStatus(userId);
         // 최신 접속 시간 업데이트
-        userStatus.updateAccessTime();
+        userStatus.updateAccessTime(request.getNewLastActiveAt());
         // 저장
         userStatusRepository.save(userStatus);
         return userStatusMapper.toDto(userStatus);

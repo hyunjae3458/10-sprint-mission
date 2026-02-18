@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
@@ -31,6 +32,15 @@ public class FileMessageRepository implements MessageRepository {
     public List<Message> findAll() {
         Map<UUID, Message> data = loadData();
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public Optional<Message> findLatestByChannelId(UUID channelId) {
+        Map<UUID, Message> data = loadData();
+
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .findFirst();
     }
 
     @Override

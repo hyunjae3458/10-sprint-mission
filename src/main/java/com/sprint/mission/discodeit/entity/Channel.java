@@ -15,9 +15,16 @@ public class Channel extends BaseEntity {
     private List<UUID> userList;
     private List<UUID> messageList;
     private ChannelType channelType;
+    private String description;
 
-    public Channel(String channelName) {
+    public Channel(String channelName, String description) {
         this.channelName = channelName;
+        this.description = description;
+        this.userList = new ArrayList<>();
+        this.messageList = new ArrayList<>();
+    }
+
+    public Channel(){
         this.userList = new ArrayList<>();
         this.messageList = new ArrayList<>();
     }
@@ -34,8 +41,9 @@ public class Channel extends BaseEntity {
         }
     }
 
-    public void updateChannel(String newChannelName){
+    public void updateChannel(String newChannelName,String newDescriptionn){
         this.channelName = newChannelName;
+        this.description = newDescriptionn;
         updateTimeStamp();
     }
 
