@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class MessageUpdateDto {
-    private UUID userId;
-    private String text;
+public class MessageUpdateRequest {
+    private String newContent;
 }

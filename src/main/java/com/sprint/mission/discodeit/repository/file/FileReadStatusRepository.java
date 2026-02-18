@@ -29,17 +29,28 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return Optional.ofNullable(loadData().get(id));
     }
     @Override
-    public List<ReadStatus> findAll() {
-        return new ArrayList<>(loadData().values());
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        Map<UUID, ReadStatus> data = loadData();
+        return data.values().stream()
+                .filter(rs-> rs.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        Map<UUID, ReadStatus> data = loadData();
+
+        return data.values().stream()
+                .filter(rs-> rs.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
     public List<ReadStatus> findAllByUserIdChannelId(UUID userId, UUID channelId) {
         Map<UUID, ReadStatus> data = loadData();
 
-
         return data.values().stream()
-                .filter(rs-> rs.getUserId().equals(userId) && rs.getChannelId().equals(channelId))
+                .filter(rs-> rs.getChannelId().equals(channelId)&&rs.getUserId().equals(userId))
                 .toList();
     }
 

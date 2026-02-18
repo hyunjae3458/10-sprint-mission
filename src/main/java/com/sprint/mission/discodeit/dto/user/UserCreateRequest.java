@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Setter
 public class UserCreateRequest {
-    private String name;
+    private String username;
     private String email;
     private String password;
 }

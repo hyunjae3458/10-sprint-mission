@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -11,10 +10,9 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.naming.NoPermissionException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,17 +23,14 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public ReadStatusResponseDto create(ReadStatusCreateDto dto) {
+    public ReadStatusDto create(ReadStatusCreateRequest dto) {
         // userId, channelId가 null이라면 예외
         if(dto.getUserId() == null || dto.getChannelId() == null){
             throw new NoSuchElementException("사용자나 채널이 존재하지 않습니다.");
         }
         // channelId, userId가 중복된 객체가 있는지 확인
-        List<ReadStatus> duplicateList = readStatusRepository.findAll().stream()
-                .filter(readStatus ->
-                        readStatus.getChannelId().equals(dto.getChannelId()) &&
-                                readStatus.getUserId().equals(dto.getUserId()))
-                .toList();
+        List<ReadStatus> duplicateList =
+                new ArrayList<>(readStatusRepository.findAllByUserIdChannelId(dto.getUserId(),dto.getChannelId()));
 
         // 중복된게 없다면 생성
         if(duplicateList.isEmpty()){
@@ -51,22 +46,22 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto findReadStatus(UUID id) {
+    public ReadStatusDto findReadStatus(UUID id) {
         ReadStatus readStatus = getReadStatus(id);
 
         return readStatusMapper.toDto(readStatus);
     }
 
     @Override
-    public List<ReadStatusResponseDto> findAllByUserIdChannelId(UUID userId, UUID channelId) {
-        List<ReadStatus> readStatusList = readStatusRepository.findAllByUserIdChannelId(userId,channelId);
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
         return readStatusList.stream()
                                         .map(readStatusMapper::toDto)
                                         .toList();
     }
 
     @Override
-    public ReadStatusResponseDto update(UUID id) {
+    public ReadStatusDto update(UUID id) {
         ReadStatus readStatus = getReadStatus(id);
         readStatus.updateReadTime();
         readStatusRepository.save(readStatus);

@@ -20,4 +20,10 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse("WRONG_PASSWORD",e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    @ExceptionHandler(ChannelNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleChannelNotFoundException(ChannelNotFoundException e){
+        ErrorResponse response = new ErrorResponse("CHANNEL_NOT_FOUND",e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
 }

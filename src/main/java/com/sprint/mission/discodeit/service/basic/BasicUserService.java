@@ -32,7 +32,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto create(UserCreateRequest request, MultipartFile profile) {
         // 유저 객체 생성
-        User user = new User(request.getName(),
+        User user = new User(request.getUsername(),
                 request.getEmail(),
                 request.getPassword());
 
@@ -133,8 +133,8 @@ public class BasicUserService implements UserService {
             user.updateName(request.getNewUsername());
         }
         // 이메일 수정
-        if(request.getNewEamil() != null){
-            user.updateEmail(request.getNewEamil());
+        if(request.getNewEmail() != null){
+            user.updateEmail(request.getNewEmail());
         }
         // 비밀번호 수정
         if(request.getNewPassword() != null){
@@ -177,8 +177,7 @@ public class BasicUserService implements UserService {
         User user = getUser(userId);
 
         // 유저를 가지고 있는 readStatus를 통해서 채널 조회
-        List<UUID> channelList = readStatusRepository.findAll().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userId))
+        List<UUID> channelList = readStatusRepository.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .toList();
         // 채널에서 유저삭제

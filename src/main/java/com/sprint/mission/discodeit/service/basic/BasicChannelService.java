@@ -98,11 +98,9 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("해당 사용자가 없습니다."));
 
-        System.out.println("[" + user + "가 속한 채널 조회]");
-        List<ReadStatus> readStatusList = readStatusRepository.findAll();
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
         // 공용채널 조회
         List<ChannelDto> publicList = readStatusList.stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .map(readStatus ->
                     getChannel(readStatus.getChannelId()))
                 .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC)
@@ -166,10 +164,8 @@ public class BasicChannelService implements ChannelService {
         });
 
         // 채널과 연관된 ReadStatus도 삭제
-        List<ReadStatus> readStatusList = readStatusRepository.findAll();
-        readStatusList.stream()
-                        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                        .forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
+        readStatusList.forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
 
         channelRepository.delete(channelId);
     }

@@ -8,6 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class UserUpdateRequest {
     private String newUsername;
-    private String newEamil;
+    private String newEmail;
     private String newPassword;
 }

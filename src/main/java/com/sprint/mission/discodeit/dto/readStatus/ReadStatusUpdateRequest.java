@@ -6,6 +6,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatusUpdateDto {
-    private UUID id;
+public class ReadStatusUpdateRequest {
+    private Instant newLastReadAt;
 }

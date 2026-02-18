@@ -166,7 +166,7 @@
         "operationId": "getAllMessage",
         "parameters": [
           {
-            "name": "channeld",
+            "name": "channelId",
             "in": "query",
             "required": true,
             "schema": {
@@ -191,7 +191,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MessageResponseDto"
+                    "$ref": "#/components/schemas/MessageDto"
                   }
                 }
               }
@@ -208,11 +208,26 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MessageCreateDto"
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "$ref": "#/components/schemas/MessageCreateRequest"
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                },
+                "required": [
+                  "attachments",
+                  "request"
+                ]
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -220,7 +235,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
               }
             }
@@ -588,7 +603,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MessageUpdateDto"
+                "$ref": "#/components/schemas/MessageUpdateRequest"
               }
             }
           },
@@ -600,7 +615,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
               }
             }
@@ -723,7 +738,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/MessageResponseDto"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
               }
             }
@@ -966,25 +981,10 @@
           }
         }
       },
-      "BinaryContentCreateDto": {
+      "MessageCreateRequest": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "contentType": {
-            "type": "string"
-          },
-          "fileData": {
-            "type": "string",
-            "format": "byte"
-          }
-        }
-      },
-      "MessageCreateDto": {
-        "type": "object",
-        "properties": {
-          "userId": {
+          "authorId": {
             "type": "string",
             "format": "uuid"
           },
@@ -992,18 +992,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "text": {
+          "content": {
             "type": "string"
-          },
-          "binaryContentList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BinaryContentCreateDto"
-            }
           }
         }
       },
-      "MessageResponseDto": {
+      "MessageDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1017,6 +1011,13 @@
           "channelId": {
             "type": "string",
             "format": "uuid"
+          },
+          "attachmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "text": {
             "type": "string"
@@ -1048,7 +1049,7 @@
           "description": {
             "type": "string"
           },
-          "participantsIds": {
+          "participantIds": {
             "type": "array",
             "items": {
               "type": "string",
@@ -1071,7 +1072,7 @@
       "PublicChannelCreateRequest": {
         "type": "object",
         "properties": {
-          "channelName": {
+          "name": {
             "type": "string"
           },
           "description": {
@@ -1082,7 +1083,7 @@
       "PrivateChannelCreateRequest": {
         "type": "object",
         "properties": {
-          "participantsIds": {
+          "participantIds": {
             "type": "array",
             "items": {
               "type": "string",
@@ -1155,15 +1156,15 @@
           }
         }
       },
-      "MessageUpdateDto": {
+      "MessageUpdateRequest": {
         "type": "object",
         "properties": {
+          "newContent": {
+            "type": "string"
+          },
           "userId": {
             "type": "string",
             "format": "uuid"
-          },
-          "text": {
-            "type": "string"
           }
         }
       },

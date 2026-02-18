@@ -9,9 +9,8 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class MessageCreateDto {
-    private UUID userId;
+public class MessageCreateRequest {
+    private UUID authorId;
     private UUID channelId;
-    private String text;
-    private List<BinaryContentCreateDto> binaryContentList;
+    private String content;
 }

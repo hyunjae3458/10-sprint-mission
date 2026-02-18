@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -16,7 +18,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -31,21 +35,29 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public MessageResponseDto create(MessageCreateDto dto) {
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 없습니다."));
-        Channel channel = channelRepository.findById(dto.getChannelId())
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+    public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments) {
+        User user = userRepository.findById(request.getAuthorId())
+                .orElseThrow(() -> new UserNotFoundException(request.getAuthorId()));
+        Channel channel = channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId()));
         // 메시지 객체 생성
-        Message message = new Message(dto.getUserId(),dto.getText(),dto.getChannelId());
-        List<BinaryContentCreateDto> binaryContentList = dto.getBinaryContentList();
-        binaryContentList.forEach(bcDto -> {
-                    BinaryContent binaryContent =  new BinaryContent(null,
-                            message.getId(),
-                            bcDto.getFileData(),
-                            bcDto.getName(),
-                            bcDto.getContentType());
-                    message.addBinaryContent(binaryContent.getId());
+        Message message = new Message(request.getAuthorId(),request.getContent(),request.getChannelId());
+        if(attachments == null){
+            attachments = new ArrayList<>();
+        }
+
+        attachments.forEach(bcDto -> {
+            BinaryContent binaryContent;
+            try {
+                binaryContent = new BinaryContent(null,
+                        message.getId(),
+                        bcDto.getBytes(),
+                        bcDto.getOriginalFilename(),
+                        bcDto.getContentType());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            message.addBinaryContent(binaryContent.getId());
                     binaryContentRepository.save(binaryContent);
                 }
 
@@ -63,35 +75,32 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto findMessage(UUID messageId) {
+    public MessageDto findMessage(UUID messageId) {
         Message message = getMessage(messageId);
 
         return messageMapper.toDto(message);
     }
 
     @Override
-    public List<MessageResponseDto> findMessageByKeyword(UUID channelId, String keyword) {
+    public List<MessageDto> findMessageByKeyword(UUID channelId, String keyword) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
-        List<MessageResponseDto> messageList = messageRepository.findAll().stream()
+        List<MessageDto> messageList = messageRepository.findAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .filter(message -> message.getText().contains(keyword))
                 .map(messageMapper::toDto)
                 .toList();
 
-        System.out.println(channel+"채널의 " + "[" + keyword + "]를 포함한 메시지 조회");
-        messageList.forEach(messageResponseDto -> System.out.println(messageResponseDto.getText()));
-
         return messageList;
     }
 
     @Override
-    public List<MessageResponseDto> findAllMessagesByChannelId(UUID channelId) {
+    public List<MessageDto> findAllMessagesByChannelId(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
 
-        List<MessageResponseDto> messageList = channel.getMessageList().stream()
+        List<MessageDto> messageList = channel.getMessageList().stream()
                 .map(messageId -> messageMapper.toDto(getMessage(messageId)))
                 .toList();
 
@@ -133,17 +142,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto update(UUID messageId, MessageUpdateDto dto) {
+    public MessageDto update(UUID messageId, MessageUpdateRequest dto) {
         Message message = getMessage(messageId);
-        User user  = userRepository.findById(dto.getUserId())
-                .orElseThrow(()-> new NoSuchElementException("해당 유저가 없습니다."));
-
-        // 권한 체크
-        if(!dto.getUserId().equals(message.getUserId())){
-            throw new IllegalStateException("수정할 권한이 없습니다");
-        }
+//        User user  = userRepository.findById(dto.getUserId())
+//                .orElseThrow(()-> new NoSuchElementException("해당 유저가 없습니다."));
+//
+//        // 권한 체크
+//        if(!dto.getUserId().equals(message.getUserId())){
+//            throw new IllegalStateException("수정할 권한이 없습니다");
+//        }
         // 메시지 업데이트
-        message.updateMessage(dto.getText());
+        message.updateMessage(dto.getNewContent());
         messageRepository.save(message);
 
         return messageMapper.toDto(message);

@@ -27,14 +27,23 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<ReadStatus> findAll() {
-        return new ArrayList<>(data.values());
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(rs-> rs.getUserId().equals(userId))
+                .toList();
     }
 
     @Override
-    public List<ReadStatus> findAllByUserIdChannelId(UUID userId,UUID channelId) {
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return data.values().stream()
-                .filter(rs-> rs.getUserId().equals(userId) && rs.getChannelId().equals(channelId))
+                .filter(rs-> rs.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserIdChannelId(UUID userId, UUID channelId) {
+        return data.values().stream()
+                .filter(rs-> rs.getChannelId().equals(channelId)&&rs.getUserId().equals(userId))
                 .toList();
     }
 
