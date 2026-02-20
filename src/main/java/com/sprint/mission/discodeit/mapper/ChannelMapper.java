@@ -20,7 +20,7 @@ public class ChannelMapper {
                 channel.getChannelName(),
                 channel.getDescription(),
                 channel.getUserList(),
-                messageService.findLatestMessageByChannelId(channel.getId()),
+                channel.getLastMessageAt(),
                 channel.getChannelType());
     }
 

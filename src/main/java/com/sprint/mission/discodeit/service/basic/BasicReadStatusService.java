@@ -41,7 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
         }
         // 있다면 예외처리
         else {
-            throw new IllegalStateException("중복된 객체가 있습니다");
+            return readStatusMapper.toDto(duplicateList.get(0));
         }
     }
 

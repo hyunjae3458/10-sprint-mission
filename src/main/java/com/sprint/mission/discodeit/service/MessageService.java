@@ -12,7 +12,6 @@ import java.util.UUID;
 public interface MessageService {
     MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments);
     MessageDto findMessage(UUID messageId);
-    Instant findLatestMessageByChannelId(UUID channelId);
     List<MessageDto> findMessageByKeyword(UUID channelId, String keyword);
     List<MessageDto> findAllMessagesByChannelId(UUID channelId);
     MessageDto update(UUID messageId, MessageUpdateRequest dto);

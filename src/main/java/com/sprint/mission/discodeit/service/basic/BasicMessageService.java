@@ -65,7 +65,7 @@ public class BasicMessageService implements MessageService {
         // 유저와 채널에 연관성 추가
         user.addMessage(message.getId());
         channel.addMessage(message.getId());
-
+        channel.setLastMessageAt(message.getCreatedAt());
         // 데이터에 정보 저장
         messageRepository.save(message);
         userRepository.save(user);
@@ -106,17 +106,6 @@ public class BasicMessageService implements MessageService {
 
         return messageList;
     }
-
-    @Override
-    public Instant findLatestMessageByChannelId(UUID channelId) {
-        Message message = messageRepository.findLatestByChannelId(channelId)
-                .orElse(null);
-        if(message == null){
-            return null;
-        }
-        return message.getCreatedAt();
-    }
-
     @Override
     public void delete(UUID messageId) {
         Message message = getMessage(messageId);

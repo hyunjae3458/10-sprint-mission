@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.type.ChannelType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +15,7 @@ public class Channel extends BaseEntity {
     private String channelName;
     private List<UUID> userList;
     private List<UUID> messageList;
+    private Instant lastMessageAt;
     private ChannelType channelType;
     private String description;
 
@@ -22,6 +24,7 @@ public class Channel extends BaseEntity {
         this.description = description;
         this.userList = new ArrayList<>();
         this.messageList = new ArrayList<>();
+        this.lastMessageAt = Instant.now();
     }
 
     public Channel(){
