@@ -19,6 +19,7 @@ public class ChannelController {
     private final ChannelService channelService;
 
     // 공용 채널 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/public",method = RequestMethod.POST)
     public ResponseEntity<ChannelCreateResponse> postPublicChannel(@RequestBody PublicChannelCreateRequest request){
         ChannelCreateResponse response = channelService.createPublic(request);
@@ -26,6 +27,7 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // 사설 채널 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/private",method = RequestMethod.POST)
     public ResponseEntity<ChannelCreateResponse> postPrivateChannel(@RequestBody PrivateChannelCreateRequest request){
         ChannelCreateResponse response = channelService.createPrivate(request);
@@ -63,6 +65,7 @@ public class ChannelController {
     }
 
     // 채널 삭제
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteChannel(@PathVariable("channelId") UUID id){
         channelService.delete(id);

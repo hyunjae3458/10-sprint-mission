@@ -20,6 +20,10 @@
       "description": "Channel API"
     },
     {
+      "name": "BinaryContents",
+      "description": "파일 관리 관련 API"
+    },
+    {
       "name": "Message",
       "description": "Message API"
     },
@@ -28,8 +32,8 @@
       "description": "User API"
     },
     {
-      "name": "BinaryContents",
-      "description": "BinaryContent API"
+      "name": "ReadStatus",
+      "description": "읽음 상태 관련 API"
     }
   ],
   "paths": {
@@ -82,8 +86,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "*/*": {
                 "schema": {
@@ -98,7 +102,7 @@
     "/api/readStatuses": {
       "get": {
         "tags": [
-          "read-status-controller"
+          "ReadStatus"
         ],
         "operationId": "getAllReadStatus",
         "parameters": [
@@ -130,7 +134,7 @@
       },
       "post": {
         "tags": [
-          "read-status-controller"
+          "ReadStatus"
         ],
         "operationId": "getReadStatus",
         "requestBody": {
@@ -144,8 +148,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "*/*": {
                 "schema": {
@@ -228,8 +232,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "*/*": {
                 "schema": {
@@ -258,12 +262,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChannelDto"
+                  "$ref": "#/components/schemas/ChannelCreateResponse"
                 }
               }
             }
@@ -288,12 +292,12 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChannelDto"
+                  "$ref": "#/components/schemas/ChannelCreateResponse"
                 }
               }
             }
@@ -349,8 +353,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       },
@@ -442,7 +446,7 @@
     "/api/readStatuses/{readStatusId}": {
       "patch": {
         "tags": [
-          "read-status-controller"
+          "ReadStatus"
         ],
         "operationId": "updateReadStatus",
         "parameters": [
@@ -498,8 +502,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       },
@@ -561,8 +565,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           }
         }
       },
@@ -863,27 +867,18 @@
           }
         }
       },
-      "ChannelDto": {
+      "ChannelCreateResponse": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "name": {
-            "type": "string"
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           },
-          "description": {
-            "type": "string"
-          },
-          "participantIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "lastMessageAt": {
+          "updatedAt": {
             "type": "string",
             "format": "date-time"
           },
@@ -893,6 +888,12 @@
               "PRIVATE",
               "PUBLIC"
             ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
           }
         }
       },
@@ -997,6 +998,39 @@
           },
           "newDescription": {
             "type": "string"
+          }
+        }
+      },
+      "ChannelDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "participantIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PRIVATE",
+              "PUBLIC"
+            ]
           }
         }
       },

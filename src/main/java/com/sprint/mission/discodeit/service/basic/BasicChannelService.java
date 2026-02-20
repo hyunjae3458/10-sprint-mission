@@ -94,9 +94,7 @@ public class BasicChannelService implements ChannelService {
 
         List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
         // 공용채널 조회
-        List<ChannelDto> publicList = readStatusList.stream()
-                .map(readStatus ->
-                    getChannel(readStatus.getChannelId()))
+        List<ChannelDto> publicList = channelRepository.findAll().stream()
                 .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC)
                 .map(channelMapper::toDto)
                 .toList();
@@ -104,8 +102,9 @@ public class BasicChannelService implements ChannelService {
         // 개인채널 조회
         List<ChannelDto> privateList = readStatusList.stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
-                .map(readStatus ->
-                        getChannel(readStatus.getChannelId()))
+                .map(readStatus -> channelRepository.findById(readStatus.getChannelId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .filter(channel -> channel.getChannelType() == ChannelType.PRIVATE)
                 .map(channelMapper::toDto)
                 .toList();

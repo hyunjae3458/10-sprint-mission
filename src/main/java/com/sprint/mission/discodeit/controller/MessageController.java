@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +25,10 @@ public class MessageController {
     private final MessageService messageService;
 
     // 메시지 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageDto> postMessage(@RequestPart("messageCreateRequest") MessageCreateRequest request,
+    public ResponseEntity<MessageDto> postMessage(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+                                                  @RequestPart("messageCreateRequest") MessageCreateRequest request,
                                                   @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments){
         MessageDto response = messageService.create(request, attachments);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -58,6 +62,7 @@ public class MessageController {
     }
 
     // 메시지 삭제
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID id){
         messageService.delete(id);

@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,9 +27,11 @@ public class UserController {
     private final UserService userService;
 
     // 유저 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> postUser(@RequestPart("userCreateRequest") UserCreateRequest request,
-                                          @RequestPart(value = "profile", required = false)MultipartFile profile){
+    public ResponseEntity<UserDto> postUser(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+                                            @RequestPart("userCreateRequest") UserCreateRequest request,
+                                            @RequestPart(value = "profile", required = false)MultipartFile profile){
         UserDto response = userService.create(request , profile);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -48,7 +52,8 @@ public class UserController {
 
     // 유저 업데이트
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> updateUser(@PathVariable("userId") UUID id,
+    public ResponseEntity<UserDto> updateUser(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+                                              @PathVariable("userId") UUID id,
                                               @RequestPart("userUpdateRequest") UserUpdateRequest request,
                                               @RequestPart(value="profile", required = false) MultipartFile profile){
         UserDto response = userService.update(id,request, profile);
@@ -64,6 +69,7 @@ public class UserController {
     }
 
     // 유저 삭제
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") UUID id){
         userService.delete(id);

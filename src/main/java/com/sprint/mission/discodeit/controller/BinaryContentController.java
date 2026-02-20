@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/binaryContents")
-@Tag(name = "BinaryContents", description = "BinaryContent API")
+@Tag(name = "BinaryContents", description = "파일 관리 관련 API")
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;

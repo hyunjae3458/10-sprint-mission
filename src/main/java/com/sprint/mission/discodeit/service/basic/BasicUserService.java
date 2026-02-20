@@ -82,19 +82,24 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDto> findAllUsers() {
         List<User> userList = userRepository.findAll();
-        // 유저 상태들을 유저 아이디를 키로한 맵으로 가져옴
-        Map<UUID, UserStatus> userStatusMap = userStatusRepository.findAll();
-        // 가져온 객체들을 dto로 변환
-        List<UserDto> dtoList = userList.stream()
-                .map(user -> {
-                    boolean online = userStatusRepository.findByUserId(user.getId())
-                                            .map(us -> isOnline(us.getLastOnlineAt()))
-                                            .orElseThrow(() -> new NoSuchElementException("해당 유저상태는 없습니다."));
-                    return userMapper.toDto(user, online);
-                })
-                .toList();
 
-        return dtoList;
+        if(!userList.isEmpty()){
+            // 유저 상태들을 유저 아이디를 키로한 맵으로 가져옴
+            Map<UUID, UserStatus> userStatusMap = userStatusRepository.findAll();
+            // 가져온 객체들을 dto로 변환
+            List<UserDto> dtoList = userList.stream()
+                    .map(user -> {
+                        boolean online = userStatusRepository.findByUserId(user.getId())
+                                .map(us -> isOnline(us.getLastOnlineAt()))
+                                .orElseThrow(() -> new NoSuchElementException("해당 유저상태는 없습니다."));
+                        return userMapper.toDto(user, online);
+                    })
+                    .toList();
+
+            return dtoList;
+        } else{
+            return new ArrayList<>();
+        }
     }
 
     @Override

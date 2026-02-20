@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/readStatuses")
+@Tag(name = "ReadStatus", description = "읽음 상태 관련 API")
 @RequiredArgsConstructor
 public class readStatusController {
     private final ReadStatusService readStatusService;
     // 메시지 수신 상태 생성
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatusDto> getReadStatus(@RequestBody ReadStatusCreateRequest dto){
         ReadStatusDto response = readStatusService.create(dto);
