@@ -8,11 +8,11 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class BinaryContentResponseDto {
+public class BinaryContentDto {
     private UUID id;
-    private UUID userId;
-    private UUID messageId;
+    private Instant createdAt;
     private byte[] bytes;
+    private long size;
     private String fileName;
     private String contentType;
 }

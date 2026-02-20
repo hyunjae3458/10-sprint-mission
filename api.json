@@ -20,8 +20,16 @@
       "description": "Channel API"
     },
     {
+      "name": "Message",
+      "description": "Message API"
+    },
+    {
       "name": "User",
       "description": "User API"
+    },
+    {
+      "name": "BinaryContents",
+      "description": "BinaryContent API"
     }
   ],
   "paths": {
@@ -54,7 +62,7 @@
         "operationId": "postUser",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -102,15 +110,6 @@
               "type": "string",
               "format": "uuid"
             }
-          },
-          {
-            "name": "channelId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "responses": {
@@ -121,7 +120,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ReadStatusResponseDto"
+                    "$ref": "#/components/schemas/ReadStatusDto"
                   }
                 }
               }
@@ -138,7 +137,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReadStatusCreateDto"
+                "$ref": "#/components/schemas/ReadStatusCreateRequest"
               }
             }
           },
@@ -150,7 +149,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadStatusResponseDto"
+                  "$ref": "#/components/schemas/ReadStatusDto"
                 }
               }
             }
@@ -161,7 +160,7 @@
     "/api/messages": {
       "get": {
         "tags": [
-          "message-controller"
+          "Message"
         ],
         "operationId": "getAllMessage",
         "parameters": [
@@ -201,16 +200,16 @@
       },
       "post": {
         "tags": [
-          "message-controller"
+          "Message"
         ],
         "operationId": "postMessage",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "request": {
+                  "messageCreateRequest": {
                     "$ref": "#/components/schemas/MessageCreateRequest"
                   },
                   "attachments": {
@@ -222,8 +221,7 @@
                   }
                 },
                 "required": [
-                  "attachments",
-                  "request"
+                  "messageCreateRequest"
                 ]
               }
             }
@@ -236,47 +234,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/channels/{channelId}/join": {
-      "post": {
-        "tags": [
-          "Channel"
-        ],
-        "operationId": "joinUsers",
-        "parameters": [
-          {
-            "name": "channelId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChannelJoinDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -375,35 +332,6 @@
       }
     },
     "/api/users/{userId}": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "getUser",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "User"
@@ -444,7 +372,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -526,33 +454,25 @@
               "type": "string",
               "format": "uuid"
             }
-          },
-          {
-            "name": "channelId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadStatusUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadStatusResponseDto"
+                  "$ref": "#/components/schemas/ReadStatusDto"
                 }
               }
             }
@@ -563,7 +483,7 @@
     "/api/messages/{id}": {
       "delete": {
         "tags": [
-          "message-controller"
+          "Message"
         ],
         "operationId": "deleteMessage",
         "parameters": [
@@ -585,7 +505,7 @@
       },
       "patch": {
         "tags": [
-          "message-controller"
+          "Message"
         ],
         "operationId": "updateMessage",
         "parameters": [
@@ -624,35 +544,6 @@
       }
     },
     "/api/channels/{channelId}": {
-      "get": {
-        "tags": [
-          "Channel"
-        ],
-        "operationId": "getChannel",
-        "parameters": [
-          {
-            "name": "channelId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChannelDto"
-                }
-              }
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "Channel"
@@ -715,37 +606,6 @@
         }
       }
     },
-    "/api/messages/message/{id}": {
-      "get": {
-        "tags": [
-          "message-controller"
-        ],
-        "operationId": "getMessage",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/channels": {
       "get": {
         "tags": [
@@ -783,9 +643,23 @@
     "/api/binaryContents": {
       "get": {
         "tags": [
-          "binary-content-controller"
+          "BinaryContents"
         ],
         "operationId": "getAllBinaryContent",
+        "parameters": [
+          {
+            "name": "binaryContentIds",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -794,8 +668,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "format": "uuid"
+                    "$ref": "#/components/schemas/BinaryContentDto"
                   }
                 }
               }
@@ -807,7 +680,7 @@
     "/api/binaryContents/{binaryContentId}": {
       "get": {
         "tags": [
-          "binary-content-controller"
+          "BinaryContents"
         ],
         "operationId": "getBinaryContent",
         "parameters": [
@@ -827,72 +700,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BinaryContent"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/binaryContents/user/{user-id}": {
-      "get": {
-        "tags": [
-          "binary-content-controller"
-        ],
-        "operationId": "getProfileImg",
-        "parameters": [
-          {
-            "name": "user-id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/BinaryContent"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/binaryContents/message/{message-id}": {
-      "get": {
-        "tags": [
-          "binary-content-controller"
-        ],
-        "operationId": "getAllMessageBinaryContent",
-        "parameters": [
-          {
-            "name": "message-id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BinaryContent"
-                  }
+                  "$ref": "#/components/schemas/BinaryContentDto"
                 }
               }
             }
@@ -906,7 +714,7 @@
       "UserCreateRequest": {
         "type": "object",
         "properties": {
-          "name": {
+          "username": {
             "type": "string"
           },
           "email": {
@@ -947,7 +755,7 @@
           }
         }
       },
-      "ReadStatusCreateDto": {
+      "ReadStatusCreateRequest": {
         "type": "object",
         "properties": {
           "userId": {
@@ -957,10 +765,14 @@
           "channelId": {
             "type": "string",
             "format": "uuid"
+          },
+          "lastReadAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
-      "ReadStatusResponseDto": {
+      "ReadStatusDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -971,11 +783,19 @@
             "type": "string",
             "format": "uuid"
           },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "channelId": {
             "type": "string",
             "format": "uuid"
           },
-          "lastReadTime": {
+          "lastReadAt": {
             "type": "string",
             "format": "date-time"
           }
@@ -1004,13 +824,21 @@
             "type": "string",
             "format": "uuid"
           },
-          "userId": {
+          "authorId": {
             "type": "string",
             "format": "uuid"
           },
           "channelId": {
             "type": "string",
             "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           },
           "attachmentIds": {
             "type": "array",
@@ -1019,20 +847,19 @@
               "format": "uuid"
             }
           },
-          "text": {
+          "content": {
             "type": "string"
           }
         }
       },
-      "ChannelJoinDto": {
+      "PublicChannelCreateRequest": {
         "type": "object",
         "properties": {
-          "userList": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
           }
         }
       },
@@ -1066,17 +893,6 @@
               "PRIVATE",
               "PUBLIC"
             ]
-          }
-        }
-      },
-      "PublicChannelCreateRequest": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
           }
         }
       },
@@ -1139,7 +955,7 @@
           "newUsername": {
             "type": "string"
           },
-          "newEamil": {
+          "newEmail": {
             "type": "string"
           },
           "newPassword": {
@@ -1156,15 +972,20 @@
           }
         }
       },
+      "ReadStatusUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "newLastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "MessageUpdateRequest": {
         "type": "object",
         "properties": {
           "newContent": {
             "type": "string"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
           }
         }
       },
@@ -1179,18 +1000,10 @@
           }
         }
       },
-      "BinaryContent": {
+      "BinaryContentDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "messageId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1201,6 +1014,10 @@
           "bytes": {
             "type": "string",
             "format": "byte"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
           },
           "fileName": {
             "type": "string"

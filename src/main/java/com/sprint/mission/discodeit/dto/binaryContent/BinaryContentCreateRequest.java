@@ -4,12 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @NoArgsConstructor
 @Setter
-public class BinaryContentCreateDto {
+public class BinaryContentCreateRequest {
+    private long size;
     private String name;
     private String contentType;
     private byte[] fileData;

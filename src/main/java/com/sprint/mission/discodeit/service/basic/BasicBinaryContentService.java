@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -9,10 +9,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -21,43 +18,55 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
-    public BinaryContent create(BinaryContentCreateDto dto) {
-        BinaryContent binaryContent = binaryContentMapper.toEntity(dto);
+    public BinaryContentDto create(BinaryContentCreateRequest dto) {
+        BinaryContent binaryContent = new BinaryContent(null,
+                null,
+                dto.getSize(),
+                dto.getFileData(),
+                dto.getName(),
+                dto.getContentType());
+
         binaryContentRepository.save(binaryContent);
 
-        return binaryContent;
+        return binaryContentMapper.toDto(binaryContent);
     }
     @Override
-    public BinaryContent findId(UUID id) {
-        return getBinaryContentId(id);
+    public BinaryContentDto findId(UUID id) {
+        return  binaryContentMapper.toDto(getBinaryContentId(id));
     }
+
+//    @Override
+//    public BinaryContentDto findBinaryContentByUserId(UUID userId) {
+//
+//        return getBinaryContentByUserId(userId);
+//    }
 
     @Override
-    public BinaryContent findBinaryContentByUserId(UUID userId) {
-
-        return getBinaryContentByUserId(userId);
+    public List<BinaryContentDto> findAllIdIn(List<UUID> binaryContentId) {
+        return binaryContentId.stream()
+                .map(binaryContentRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(binaryContentMapper::toDto)
+                .toList();
     }
 
-    @Override
-    public List<UUID> findAllIdIn() {
-        return new ArrayList<>(binaryContentRepository.findAll());
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageId(UUID messageId) {
-
-        return binaryContentRepository.findByMessageId(messageId);
-    }
+//    @Override
+//    public List<BinaryContentDto> findAllByMessageId(UUID messageId) {
+//
+//        return binaryContentRepository.findByMessageId(messageId);
+//    }
 
     @Override
     public void delete(UUID id) {
         binaryContentRepository.delete(id);
 
     }
-    private BinaryContent getBinaryContentByUserId(UUID userId){
-        return binaryContentRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 파일컨텐츠가 없습니다."));
-    }
+
+//    private BinaryContent getBinaryContentByUserId(UUID userId){
+//        return binaryContentRepository.findByUserId(userId)
+//                .orElseThrow(() -> new NoSuchElementException("해당 파일컨텐츠가 없습니다."));
+//    }
 
     private BinaryContent getBinaryContentId(UUID id){
         return binaryContentRepository.findById(id)

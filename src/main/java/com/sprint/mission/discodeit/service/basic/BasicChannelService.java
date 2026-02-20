@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -19,9 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static com.sprint.mission.discodeit.entity.type.ChannelType.PRIVATE;
-import static com.sprint.mission.discodeit.entity.type.ChannelType.PUBLIC;
-
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -32,18 +26,18 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
 
     @Override
-    public ChannelDto createPublic(PublicChannelCreateRequest request) {
-        // 공용 채널
+    // 공용 채널
+    public ChannelCreateResponse createPublic(PublicChannelCreateRequest request) {
         // 채널 생성
         Channel channel = new Channel(request.getName(), request.getDescription());
-        channel.setChannelType(PUBLIC);
+        channel.setChannelType(ChannelType.PUBLIC);
         // 채널 저장
         channelRepository.save(channel);
-        return channelMapper.toDto(channel);
+        return channelMapper.toCreateResponse(channel);
     }
 
     @Override
-    public ChannelDto createPrivate(PrivateChannelCreateRequest request) {
+    public ChannelCreateResponse createPrivate(PrivateChannelCreateRequest request) {
         // 채널 생성
         Channel channel = new Channel();
         // 입력으로 들어온 유저 당 readStatus도 생성 후 저장
@@ -55,14 +49,14 @@ public class BasicChannelService implements ChannelService {
 
         channel.setChannelType(ChannelType.PRIVATE);
         channelRepository.save(channel);
-        return channelMapper.toDto(channel);
+        return channelMapper.toCreateResponse(channel);
     }
 
     @Override
     public ChannelDto joinUsers(UUID channelId, UUID... userId) {
         Channel channel = getChannel(channelId);
         // 만약 채널이 프라이빗이라면 예외출력
-        if(channel.getChannelType() == PRIVATE){
+        if(channel.getChannelType() == ChannelType.PRIVATE){
             throw new IllegalStateException("불가! 이 채널은 Private 채널입니다");
         }
 
@@ -121,7 +115,6 @@ public class BasicChannelService implements ChannelService {
         // 합친 후 반환
         channelList.addAll(publicList);
         channelList.addAll(privateList);
-        channelList.forEach(System.out::println);
 
         return channelList;
     }

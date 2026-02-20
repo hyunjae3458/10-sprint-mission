@@ -26,23 +26,23 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
         return Optional.ofNullable(data.get(id));
     }
 
-    @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        return data.values().stream()
-                .filter(bc -> bc.getUserId().equals(userId))
-                .findFirst();
-    }
+//    @Override
+//    public Optional<BinaryContent> findByUserId(UUID userId) {
+//        return data.values().stream()
+//                .filter(bc -> bc.getUserId().equals(userId))
+//                .findFirst();
+//    }
+//
+//    @Override
+//    public List<BinaryContent> findByMessageId(UUID messageId) {
+//        return data.values().stream()
+//                .filter(bc -> bc.getMessageId().equals(messageId))
+//                .toList();
+//    }
 
     @Override
-    public List<BinaryContent> findByMessageId(UUID messageId) {
-        return data.values().stream()
-                .filter(bc -> bc.getMessageId().equals(messageId))
-                .toList();
-    }
-
-    @Override
-    public List<UUID> findAll() {
-        return new ArrayList<>(data.keySet());
+    public List<BinaryContent> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override

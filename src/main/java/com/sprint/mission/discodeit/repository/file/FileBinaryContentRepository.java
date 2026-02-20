@@ -30,24 +30,24 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         return Optional.ofNullable(loadData().get(id));
     }
 
-    @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        return loadData().values().stream()
-                .filter(bc -> bc.getUserId().equals(userId))
-                .findFirst();
-    }
+//    @Override
+//    public Optional<BinaryContent> findByUserId(UUID userId) {
+//        return loadData().values().stream()
+//                .filter(bc -> bc.getUserId().equals(userId))
+//                .findFirst();
+//    }
+
+//    @Override
+//    public List<BinaryContent> findByMessageId(UUID messageId) {
+//        return loadData().values().stream()
+//                .filter(bc -> bc.getMessageId().equals(messageId))
+//                .toList();
+//    }
 
     @Override
-    public List<BinaryContent> findByMessageId(UUID messageId) {
-        return loadData().values().stream()
-                .filter(bc -> bc.getMessageId().equals(messageId))
-                .toList();
-    }
-
-    @Override
-    public List<UUID> findAll() {
+    public List<BinaryContent> findAll() {
         Map<UUID, BinaryContent> data = loadData();
-        return new ArrayList<>(data.keySet());
+        return new ArrayList<>(data.values());
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
@@ -46,14 +45,15 @@ public class BasicMessageService implements MessageService {
             attachments = new ArrayList<>();
         }
 
-        attachments.forEach(bcDto -> {
+        attachments.forEach(bc -> {
             BinaryContent binaryContent;
             try {
                 binaryContent = new BinaryContent(null,
                         message.getId(),
-                        bcDto.getBytes(),
-                        bcDto.getOriginalFilename(),
-                        bcDto.getContentType());
+                        bc.getSize(),
+                        bc.getBytes(),
+                        bc.getOriginalFilename(),
+                        bc.getContentType());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -104,16 +104,16 @@ public class BasicMessageService implements MessageService {
                 .map(messageId -> messageMapper.toDto(getMessage(messageId)))
                 .toList();
 
-        System.out.println("-- " + channel + "에 속한 메시지 조회 --");
-        messageList.forEach(System.out::println);
-
         return messageList;
     }
 
     @Override
     public Instant findLatestMessageByChannelId(UUID channelId) {
         Message message = messageRepository.findLatestByChannelId(channelId)
-                .orElseThrow(() -> new NoSuchElementException("해당 메시자가 없습니다."));
+                .orElse(null);
+        if(message == null){
+            return null;
+        }
         return message.getCreatedAt();
     }
 

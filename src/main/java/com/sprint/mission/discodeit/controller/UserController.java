@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,7 @@ public class UserController {
     private final UserService userService;
 
     // 유저 생성
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> postUser(@RequestPart("userCreateRequest") UserCreateRequest request,
                                           @RequestPart(value = "profile", required = false)MultipartFile profile){
         UserDto response = userService.create(request , profile);
@@ -32,11 +33,11 @@ public class UserController {
     }
 
     // 유저 단건 조회
-    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<UserDto> getUser(@PathVariable("userId") UUID id){
-        UserDto response = userService.findUser(id);
-        return ResponseEntity.ok(response);
-    }
+//    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+//    public ResponseEntity<UserDto> getUser(@PathVariable("userId") UUID id){
+//        UserDto response = userService.findUser(id);
+//        return ResponseEntity.ok(response);
+//    }
 
     // 유저 전체 조회
     @RequestMapping(method = RequestMethod.GET)
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     // 유저 업데이트
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateUser(@PathVariable("userId") UUID id,
                                               @RequestPart("userUpdateRequest") UserUpdateRequest request,
                                               @RequestPart(value="profile", required = false) MultipartFile profile){
