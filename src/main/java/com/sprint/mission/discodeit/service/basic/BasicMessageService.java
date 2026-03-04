@@ -1,0 +1,155 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+public class BasicMessageService implements MessageService {
+    private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final MessageMapper messageMapper;
+    private final BinaryContentRepository binaryContentRepository;
+
+
+    @Override
+    public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments) {
+        User user = userRepository.findById(request.getAuthorId())
+                .orElseThrow(() -> new UserNotFoundException(request.getAuthorId()));
+        Channel channel = channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId()));
+        // 메시지 객체 생성
+        Message message = new Message(request.getAuthorId(),request.getContent(),request.getChannelId());
+        if(attachments == null){
+            attachments = new ArrayList<>();
+        }
+
+        attachments.forEach(bc -> {
+            BinaryContent binaryContent;
+            try {
+                binaryContent = new BinaryContent(null,
+                        message.getId(),
+                        bc.getSize(),
+                        bc.getBytes(),
+                        bc.getOriginalFilename(),
+                        bc.getContentType());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            message.addBinaryContent(binaryContent.getId());
+                    binaryContentRepository.save(binaryContent);
+                }
+
+        );
+        // 유저와 채널에 연관성 추가
+        user.addMessage(message.getId());
+        channel.addMessage(message.getId());
+        channel.setLastMessageAt(message.getCreatedAt());
+        // 데이터에 정보 저장
+        messageRepository.save(message);
+        userRepository.save(user);
+        channelRepository.save(channel);
+
+        return messageMapper.toDto(message);
+    }
+
+    @Override
+    public MessageDto findMessage(UUID messageId) {
+        Message message = getMessage(messageId);
+
+        return messageMapper.toDto(message);
+    }
+
+    @Override
+    public List<MessageDto> findMessageByKeyword(UUID channelId, String keyword) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+
+        List<MessageDto> messageList = messageRepository.findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.getText().contains(keyword))
+                .map(messageMapper::toDto)
+                .toList();
+
+        return messageList;
+    }
+
+    @Override
+    public List<MessageDto> findAllMessagesByChannelId(UUID channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+
+        List<MessageDto> messageList = channel.getMessageList().stream()
+                .map(messageId -> messageMapper.toDto(getMessage(messageId)))
+                .toList();
+
+        return messageList;
+    }
+    @Override
+    public void delete(UUID messageId) {
+        Message message = getMessage(messageId);
+
+        // 해당 메시지가 속했던 유저와 채널에서 메시지 정보 삭제
+        User user  = userRepository.findById(message.getUserId())
+                .orElseThrow(()-> new NoSuchElementException("해당 사용자가 없습니다."));
+        user.getMessageList().remove(messageId);
+        userRepository.save(user);
+
+        // 채널에 속한 메시지 리스트에서 메시지 정보 삭제
+        Channel channel = channelRepository.findById(message.getChannelId())
+                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+        channel.getMessageList().remove(messageId);
+        channelRepository.save(channel);
+
+        // 메시지와 연관된 모든 binaryContent 삭제
+        binaryContentRepository.deleteByMessageId(messageId);
+
+
+        //데이터에서 메시지 삭제
+        messageRepository.delete(messageId);
+    }
+
+    @Override
+    public MessageDto update(UUID messageId, MessageUpdateRequest dto) {
+        Message message = getMessage(messageId);
+//        User user  = userRepository.findById(dto.getUserId())
+//                .orElseThrow(()-> new NoSuchElementException("해당 유저가 없습니다."));
+//
+//        // 권한 체크
+//        if(!dto.getUserId().equals(message.getUserId())){
+//            throw new IllegalStateException("수정할 권한이 없습니다");
+//        }
+        // 메시지 업데이트
+        message.updateMessage(dto.getNewContent());
+        messageRepository.save(message);
+
+        return messageMapper.toDto(message);
+    }
+    // 유효성 검사
+    private Message getMessage(UUID messageId){
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시자가 없습니다."));
+    }
+
+}

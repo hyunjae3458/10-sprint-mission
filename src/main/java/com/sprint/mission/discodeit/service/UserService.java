@@ -1,0 +1,21 @@
+package com.sprint.mission.discodeit.service;
+
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface UserService {
+    UserDto create(UserCreateRequest request, MultipartFile profile);
+    UserDto findUser(UUID userId);
+    List<UserDto> findAllUsers();
+    UserDto addFriend(UUID senderId, UUID recieverId);
+    List<UserDto> findFriends(UUID userId);
+    UserDto update(UUID userId, UserUpdateRequest request, MultipartFile profile);
+    void updateOnlineStatus(UUID userId, UserStatusUpdateRequest request);
+    void delete(UUID userId);
+}
