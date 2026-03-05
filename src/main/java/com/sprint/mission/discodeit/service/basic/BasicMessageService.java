@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,13 +35,14 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
+    @Transactional
     public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments) {
         User user = userRepository.findById(request.getAuthorId())
                 .orElseThrow(() -> new UserNotFoundException(request.getAuthorId()));
         Channel channel = channelRepository.findById(request.getChannelId())
                 .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId()));
         // 메시지 객체 생성
-        Message message = new Message(request.getAuthorId(),request.getContent(),request.getChannelId());
+        Message message = new Message(user,request.getContent(),channel);
         if(attachments == null){
             attachments = new ArrayList<>();
         }
@@ -48,8 +50,7 @@ public class BasicMessageService implements MessageService {
         attachments.forEach(bc -> {
             BinaryContent binaryContent;
             try {
-                binaryContent = new BinaryContent(null,
-                        message.getId(),
+                binaryContent = new BinaryContent(
                         bc.getSize(),
                         bc.getBytes(),
                         bc.getOriginalFilename(),
@@ -57,24 +58,18 @@ public class BasicMessageService implements MessageService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            message.addBinaryContent(binaryContent.getId());
-                    binaryContentRepository.save(binaryContent);
-                }
+            message.addAttachment(binaryContent);
+            // 바이너리 컨텐츠는 조인 테이블의 casecade.All로 인해서 저장안해도됨
+        });
 
-        );
-        // 유저와 채널에 연관성 추가
-        user.addMessage(message.getId());
-        channel.addMessage(message.getId());
-        channel.setLastMessageAt(message.getCreatedAt());
         // 데이터에 정보 저장
         messageRepository.save(message);
-        userRepository.save(user);
-        channelRepository.save(channel);
 
         return messageMapper.toDto(message);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MessageDto findMessage(UUID messageId) {
         Message message = getMessage(messageId);
 
@@ -82,12 +77,13 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MessageDto> findMessageByKeyword(UUID channelId, String keyword) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         List<MessageDto> messageList = messageRepository.findAll().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.getChannel().equals(channel))
                 .filter(message -> message.getText().contains(keyword))
                 .map(messageMapper::toDto)
                 .toList();
@@ -96,56 +92,36 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MessageDto> findAllMessagesByChannelId(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
 
-        List<MessageDto> messageList = channel.getMessageList().stream()
-                .map(messageId -> messageMapper.toDto(getMessage(messageId)))
+        return messageRepository.findAll().stream()
+                .filter(message -> message.getChannel().equals(channel))
+                .map(messageMapper::toDto)
                 .toList();
-
-        return messageList;
-    }
-    @Override
-    public void delete(UUID messageId) {
-        Message message = getMessage(messageId);
-
-        // 해당 메시지가 속했던 유저와 채널에서 메시지 정보 삭제
-        User user  = userRepository.findById(message.getUserId())
-                .orElseThrow(()-> new NoSuchElementException("해당 사용자가 없습니다."));
-        user.getMessageList().remove(messageId);
-        userRepository.save(user);
-
-        // 채널에 속한 메시지 리스트에서 메시지 정보 삭제
-        Channel channel = channelRepository.findById(message.getChannelId())
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
-        channel.getMessageList().remove(messageId);
-        channelRepository.save(channel);
-
-        // 메시지와 연관된 모든 binaryContent 삭제
-        binaryContentRepository.deleteByMessageId(messageId);
-
-
-        //데이터에서 메시지 삭제
-        messageRepository.delete(messageId);
     }
 
     @Override
     public MessageDto update(UUID messageId, MessageUpdateRequest dto) {
         Message message = getMessage(messageId);
-//        User user  = userRepository.findById(dto.getUserId())
-//                .orElseThrow(()-> new NoSuchElementException("해당 유저가 없습니다."));
-//
-//        // 권한 체크
-//        if(!dto.getUserId().equals(message.getUserId())){
-//            throw new IllegalStateException("수정할 권한이 없습니다");
-//        }
-        // 메시지 업데이트
         message.updateMessage(dto.getNewContent());
         messageRepository.save(message);
 
         return messageMapper.toDto(message);
     }
+
+    @Override
+    @Transactional
+    public void delete(UUID messageId) {
+        Message message = getMessage(messageId);
+
+        //데이터에서 메시지 삭제 -> 조인 테이블과의 영속성 전이로 인해 관련된 조인 테이블의 데이터도 삭제 -> binaryContent와 조인테이블
+        // 과의 연결도 끊김 -> JPA는 조인 테이블과의 연결이 끊긴 데이터를 orphan으로 인식하고 삭제해버림(orphanRemoval)
+        messageRepository.delete(message);
+    }
+
     // 유효성 검사
     private Message getMessage(UUID messageId){
         return messageRepository.findById(messageId)

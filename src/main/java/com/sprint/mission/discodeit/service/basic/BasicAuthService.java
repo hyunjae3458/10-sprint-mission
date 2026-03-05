@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.AuthDto.UserLoginRequestDto;
-import com.sprint.mission.discodeit.dto.AuthDto.UserLoginResponseDto;
+import com.sprint.mission.discodeit.dto.authDto.UserLoginRequestDto;
+import com.sprint.mission.discodeit.dto.authDto.UserLoginResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.WrongPasswordException;

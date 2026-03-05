@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -25,17 +27,19 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     @Override
+    @Transactional
     public UserStatusResponseDto create(UserStatusCreateDto dto) {
+        UUID userId = dto.getUserId();
         // 관련된 사용자가 없다면 예외처리
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자는 없습니다"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         // 해당 사용자가 이미 userStatus를 가지고 있다면 예외처리
-        for(UserStatus us : userStatusRepository.findAll().values()){
-            if(us.getUserId().equals(user.getId()))
-                throw new IllegalStateException("해당 사용자와 연관된 객체가 있습니다");
+        if(userStatusRepository.existsByUserId(userId)){
+            throw new IllegalStateException("이미 존재하는 유저입니다");
         }
+
         // 만약 예외가 없다면 객체 생성
-        UserStatus userStatus = new UserStatus(dto.getUserId());
+        UserStatus userStatus = new UserStatus(user);
         // 저장
         userStatusRepository.save(userStatus);
 
@@ -43,6 +47,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserStatusResponseDto findUserStatus(UUID id) {
         UserStatus userStatus = getUserStatus(id);
 
@@ -50,26 +55,27 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserStatusResponseDto> findAll() {
-        return userStatusRepository.findAll().values().stream()
+        return userStatusRepository.findAll().stream()
                             .map(userStatusMapper::toDto)
                             .toList();
     }
 
     @Override
+    @Transactional
     public UserStatusResponseDto update(UUID userId, UserStatusUpdateRequest request) {
         // 수정할 객체 불러옴
         UserStatus userStatus = getUserStatus(userId);
         // 최신 접속 시간 업데이트
         userStatus.updateAccessTime(request.getNewLastActiveAt());
-        // 저장
-        userStatusRepository.save(userStatus);
+
         return userStatusMapper.toDto(userStatus);
     }
 
     @Override
     public void delete(UUID id) {
-        userStatusRepository.delete(id);
+        userStatusRepository.deleteById(id);
     }
 
     private UserStatus getUserStatus(UUID id){

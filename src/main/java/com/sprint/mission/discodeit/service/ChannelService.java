@@ -8,7 +8,6 @@ import java.util.UUID;
 public interface ChannelService {
     ChannelCreateResponse createPublic(PublicChannelCreateRequest request);
     ChannelCreateResponse createPrivate(PrivateChannelCreateRequest request);
-    ChannelDto joinUsers(UUID channelId, UUID ...userId);
     ChannelDto findChannel(UUID channelId);
     List<ChannelDto> findAllChannelsByUserId(UUID userId);
     List<ChannelDto> findAllChannels();

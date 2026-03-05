@@ -81,6 +81,11 @@
                 "required": [
                   "userCreateRequest"
                 ]
+              },
+              "encoding": {
+                "userCreateRequest": {
+                  "contentType": "application/json"
+                }
               }
             }
           }
@@ -136,7 +141,7 @@
         "tags": [
           "ReadStatus"
         ],
-        "operationId": "getReadStatus",
+        "operationId": "postReadStatus",
         "requestBody": {
           "content": {
             "application/json": {
@@ -227,6 +232,11 @@
                 "required": [
                   "messageCreateRequest"
                 ]
+              },
+              "encoding": {
+                "messageCreateRequest": {
+                  "contentType": "application/json"
+                }
               }
             }
           }
@@ -368,9 +378,10 @@
             "name": "userId",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+            "content": {
+              "application/json": {
+
+              }
             }
           }
         ],

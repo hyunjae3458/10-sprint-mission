@@ -1,43 +1,37 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
 public class User extends BaseEntity{
+    @Column(name="user_name", unique = true, nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
-    // 프로필 이미지로 BinaryContent를 가져옴
-    private UUID profileImageId;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profileImg;
+
+    @Column(nullable = false)
     private String password;
-    private final List<UUID> messageList;
-    private final List<UUID> friendsList;
 
     public User(String name, String email, String password){
         this.name = name;
         this.email = email;
         this.password = password;
-        this.messageList = new ArrayList<>();
-        this.friendsList = new ArrayList<>();
     }
 
-    public void addProfileImage(UUID binaryContentId){
-        this.profileImageId = binaryContentId;
-    }
-
-    public void addMessage(UUID messaageId){
-        if(!this.getMessageList().contains(messaageId)){
-            this.getMessageList().add(messaageId);
-        }
-    }
-
-    public void addFriend(UUID userId){
-        if(!this.getFriendsList().contains(userId)){
-            this.getFriendsList().add(userId);
-        }
+    public void addProfileImage(BinaryContent profileImg){
+        this.profileImg = profileImg;
     }
 
     public void updateName(String name){this.name = name;}
@@ -46,7 +40,7 @@ public class User extends BaseEntity{
         this.email = email;
     }
 
-    public void updateProfileImg(UUID profileImageId){this.profileImageId = profileImageId;}
+    public void updateProfileImg(BinaryContent profileImg){this.profileImg = profileImg;}
 
     public void updatePassword(String password){this.password = password;}
 

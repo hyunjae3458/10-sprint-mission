@@ -10,7 +10,7 @@ public class UserStatusMapper {
         if(userStatus == null) return null;
 
         return new UserStatusResponseDto(userStatus.getId(),
-                                        userStatus.getUserId(),
+                                        userStatus.getUser().getId(),
                                         userStatus.getLastOnlineAt());
     }
 }

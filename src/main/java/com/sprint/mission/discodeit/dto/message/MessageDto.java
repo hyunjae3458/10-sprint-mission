@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,11 +13,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MessageDto {
     private UUID id;
-    private UUID authorId;
+    private UserDto author;
     private UUID channelId;
     private Instant createdAt;
     private Instant updatedAt;
-    private List<UUID> attachmentIds;
+    private List<BinaryContentDto> attachmentIds;
     private String content;
 
 }

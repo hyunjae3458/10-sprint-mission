@@ -1,18 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Entity
+@Table(name = "user_statuses")
+@NoArgsConstructor
 public class UserStatus extends BaseEntity{
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", unique = true)
+    private  User user;
 
-    private final UUID userId;
+    @Column(name = "last_online_at")
     private Instant lastOnlineAt;
 
-    public UserStatus(UUID userId){
-        this.userId = userId;
+    public UserStatus(User user){
+        this.user = user;
         this.lastOnlineAt = Instant.now();
     }
 

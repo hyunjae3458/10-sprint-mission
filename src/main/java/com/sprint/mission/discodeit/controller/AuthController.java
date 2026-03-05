@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.AuthDto.UserLoginRequestDto;
-import com.sprint.mission.discodeit.dto.AuthDto.UserLoginResponseDto;
+import com.sprint.mission.discodeit.dto.authDto.UserLoginRequestDto;
+import com.sprint.mission.discodeit.dto.authDto.UserLoginResponseDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -18,9 +19,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
+    @Transactional
     public BinaryContentDto create(BinaryContentCreateRequest dto) {
-        BinaryContent binaryContent = new BinaryContent(null,
-                null,
+        BinaryContent binaryContent = new BinaryContent(
                 dto.getSize(),
                 dto.getFileData(),
                 dto.getName(),
@@ -30,45 +31,31 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         return binaryContentMapper.toDto(binaryContent);
     }
+
+
     @Override
-    public BinaryContentDto findId(UUID id) {
-        return  binaryContentMapper.toDto(getBinaryContentId(id));
+    @Transactional(readOnly = true)
+    public BinaryContentDto findBinaryContent(UUID id) {
+        return  binaryContentMapper.toDto(getBinaryContent(id));
     }
 
-//    @Override
-//    public BinaryContentDto findBinaryContentByUserId(UUID userId) {
-//
-//        return getBinaryContentByUserId(userId);
-//    }
-
     @Override
-    public List<BinaryContentDto> findAllIdIn(List<UUID> binaryContentId) {
-        return binaryContentId.stream()
-                .map(binaryContentRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+    @Transactional(readOnly = true)
+    public List<BinaryContentDto> findAllIdIn(List<UUID> binaryContentIds) {
+        // Jpa에 리스트를 받으면 요소들에 해당하는 객체를 리스트로 반환해줌
+        return binaryContentRepository.findAllById(binaryContentIds).stream()
                 .map(binaryContentMapper::toDto)
                 .toList();
     }
 
-//    @Override
-//    public List<BinaryContentDto> findAllByMessageId(UUID messageId) {
-//
-//        return binaryContentRepository.findByMessageId(messageId);
-//    }
-
     @Override
+    @Transactional
     public void delete(UUID id) {
-        binaryContentRepository.delete(id);
+        binaryContentRepository.deleteById(id);
 
     }
 
-//    private BinaryContent getBinaryContentByUserId(UUID userId){
-//        return binaryContentRepository.findByUserId(userId)
-//                .orElseThrow(() -> new NoSuchElementException("해당 파일컨텐츠가 없습니다."));
-//    }
-
-    private BinaryContent getBinaryContentId(UUID id){
+    private BinaryContent getBinaryContent(UUID id){
         return binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("해당 파일컨텐츠가 없습니다."));
     }

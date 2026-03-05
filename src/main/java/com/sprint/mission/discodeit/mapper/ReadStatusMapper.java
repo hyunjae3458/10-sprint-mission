@@ -10,10 +10,8 @@ public class ReadStatusMapper {
         if (readStatus == null) return null;
 
         return new ReadStatusDto(readStatus.getId(),
-                                readStatus.getUserId(),
-                                readStatus.getCreatedAt(),
-                                readStatus.getUpdatedAt(),
-                                readStatus.getChannelId(),
+                                readStatus.getUser().getId(),
+                                readStatus.getChannel().getId(),
                                 readStatus.getLastReadTime());
     }
 }

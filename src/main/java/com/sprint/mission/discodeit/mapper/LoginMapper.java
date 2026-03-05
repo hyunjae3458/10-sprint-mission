@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.AuthDto.UserLoginResponseDto;
+import com.sprint.mission.discodeit.dto.authDto.UserLoginResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +15,6 @@ public class LoginMapper {
                 user.getName(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getProfileImageId());
+                user.getProfileImg().getId());
     }
 }

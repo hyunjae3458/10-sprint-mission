@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,19 +14,9 @@ public class UserDto {
     private UUID id;
     private String username;
     private String email;
-    private UUID profileId;
+    private BinaryContentDto profile;
     private Instant createdAt;
     private Instant updatedAt;
     private boolean online;
 
-    @Override
-    public String toString() {
-        return "UserResponseDto{" +
-                "userId=" + id +
-                ", name='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", profileImageId=" + profileId +
-                ", online=" + online +
-                '}';
-    }
 }

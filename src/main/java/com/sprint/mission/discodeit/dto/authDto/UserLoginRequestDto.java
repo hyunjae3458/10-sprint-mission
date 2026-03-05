@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.AuthDto;
+package com.sprint.mission.discodeit.dto.authDto;
 
 import lombok.Getter;
 

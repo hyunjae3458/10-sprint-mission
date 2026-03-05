@@ -21,7 +21,7 @@ public class BinaryContentController {
     // 단건 조회
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
     public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable("binaryContentId") UUID id){
-        BinaryContentDto response = binaryContentService.findId(id);
+        BinaryContentDto response = binaryContentService.findBinaryContent(id);
         return ResponseEntity.ok(response);
     }
 

@@ -3,11 +3,15 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,14 +47,9 @@ public class MessageController {
 
     // 채널 내 메시지 조회(키워드 따라 조회 가능)
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<MessageDto>> getAllMessage(@RequestParam(required = true) UUID channelId,
-                                                          @RequestParam(required = false) String keyword){
-        if(keyword == null){
-            return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId));
-        } else{
-            return ResponseEntity.ok(messageService.findMessageByKeyword(channelId,keyword));
-        }
-
+    public ResponseEntity<List<MessageDto>> findAllByMessageId(@RequestParam(required = true) UUID channelId,
+                                                           @PageableDefault(size = 50, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+        return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId));
     }
 
     // 메시지 업데이트
