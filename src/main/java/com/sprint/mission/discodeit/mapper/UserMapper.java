@@ -2,25 +2,15 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-@RequiredArgsConstructor
-public class UserMapper {
-    private final BinaryContentMapper binaryContentMapper;
-    public UserDto toDto(User user, boolean online){
-        if(user == null) return null;
-        BinaryContentDto binaryContentDto = binaryContentMapper.toDto(user.getProfileImg());
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
+public interface UserMapper {
 
-        return new UserDto(user.getId()
-                ,user.getName()
-                ,user.getEmail()
-                ,binaryContentDto
-                ,user.getCreatedAt()
-                ,user.getUpdatedAt()
-                ,online);
-    }
+    @Mapping(target = "profile", source = "user.profile")
+    UserDto toDto(User user, boolean online);
+
 }
