@@ -19,6 +19,7 @@ logging:
     org.hibernate.SQL: info
 
 discodeit:
-  repository:
-#    type: jcf
-#    file-directory: ./data
+  storage:
+    type: local
+    local:
+      root-path: ./uploads
