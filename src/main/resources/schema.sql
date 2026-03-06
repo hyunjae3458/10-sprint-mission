@@ -27,7 +27,7 @@ CREATE TABLE channels
 CREATE TABLE users
 (
     id         UUID PRIMARY KEY,
-    user_name  VARCHAR(50) UNIQUE  NOT NULL,
+    username  VARCHAR(50) UNIQUE  NOT NULL,
     email      VARCHAR(100) UNIQUE NOT NULL,
     password   VARCHAR(60)         NOT NULL,
     profile_id UUID UNIQUE REFERENCES binary_contents (id) ON DELETE SET NULL,
@@ -61,7 +61,7 @@ CREATE TABLE messages
 CREATE TABLE message_attachments
 (
     message_id        UUID NOT NULL REFERENCES messages (id) ON DELETE CASCADE,
-    binary_content_id UUID NOT NULL REFERENCES binary_contents (id) ON DELETE CASCADE,
+    attachment_id UUID NOT NULL REFERENCES binary_contents (id) ON DELETE CASCADE,
 );
 
 -- 8. 읽음 시간 관리 테이블

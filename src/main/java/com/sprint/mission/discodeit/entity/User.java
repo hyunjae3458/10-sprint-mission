@@ -12,7 +12,7 @@ import java.util.UUID;
 @Table(name = "users")
 @NoArgsConstructor
 public class User extends BaseUpdatableEntity{
-    @Column(name="user_name", unique = true, nullable = false)
+    @Column(name="username", unique = true, nullable = false)
     private String name;
 
     @Column(name = "email", nullable = false, unique = true)
