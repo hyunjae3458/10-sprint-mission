@@ -134,7 +134,7 @@ public class BasicUserService implements UserService {
     @Transactional
     public void delete(UUID userId) {
         User user = getUser(userId);
-        BinaryContent profileImg = user.getProfileImg();
+        BinaryContent profileImg = user.getProfile();
 
         // 유저를 데이터에서 삭제
         userRepository.deleteById(userId);

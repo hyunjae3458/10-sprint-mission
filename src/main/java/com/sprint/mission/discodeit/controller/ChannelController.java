@@ -21,16 +21,16 @@ public class ChannelController {
     // 공용 채널 생성
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/public",method = RequestMethod.POST)
-    public ResponseEntity<ChannelCreateResponse> postPublicChannel(@RequestBody PublicChannelCreateRequest request){
-        ChannelCreateResponse response = channelService.createPublic(request);
+    public ResponseEntity<ChannelDto> postPublicChannel(@RequestBody PublicChannelCreateRequest request){
+        ChannelDto response = channelService.createPublic(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // 사설 채널 생성
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/private",method = RequestMethod.POST)
-    public ResponseEntity<ChannelCreateResponse> postPrivateChannel(@RequestBody PrivateChannelCreateRequest request){
-        ChannelCreateResponse response = channelService.createPrivate(request);
+    public ResponseEntity<ChannelDto> postPrivateChannel(@RequestBody PrivateChannelCreateRequest request){
+        ChannelDto response = channelService.createPrivate(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

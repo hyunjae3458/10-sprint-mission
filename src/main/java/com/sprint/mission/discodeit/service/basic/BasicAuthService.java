@@ -20,7 +20,7 @@ public class BasicAuthService implements AuthService {
     @Override
     public UserDto login(UserLoginRequestDto dto) {
         // 이름과 일치하는 객체 찾기
-        User user = userRepository.findByName(dto.getUsername())
+        User user = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(()->new UserNotFoundException(dto.getUsername()));
         // 이름이 일치하고 비밀번호가 일치하는 겍체 찾기
         if(!dto.getPassword().equals(user.getPassword())){

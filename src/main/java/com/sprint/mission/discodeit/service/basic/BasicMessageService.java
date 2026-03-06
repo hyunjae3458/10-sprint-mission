@@ -84,7 +84,7 @@ public class BasicMessageService implements MessageService {
 
         List<MessageDto> messageList = messageRepository.findAll().stream()
                 .filter(message -> message.getChannel().equals(channel))
-                .filter(message -> message.getText().contains(keyword))
+                .filter(message -> message.getContent().contains(keyword))
                 .map(messageMapper::toDto)
                 .toList();
 
