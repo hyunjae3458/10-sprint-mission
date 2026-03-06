@@ -35,15 +35,15 @@ public class ReadStatus extends BaseUpdatableEntity{
     private Channel channel;
 
     @Column(name = "last_read_at", nullable = false)
-    private Instant lastReadTime;
+    private Instant lastReadAt;
 
     public ReadStatus(User user, Channel channel){
         this.user = user;
         this.channel = channel;
-        this.lastReadTime = Instant.now();
+        this.lastReadAt = Instant.now();
     }
 
-    public void updateLastReadTime(Instant newLastReadTime){
-        this.lastReadTime = newLastReadTime;
+    public void updateLastReadTime(Instant newLastReadAt){
+        this.lastReadAt = newLastReadAt;
     }
 }

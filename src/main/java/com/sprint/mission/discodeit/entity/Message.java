@@ -2,11 +2,9 @@ package com.sprint.mission.discodeit.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -14,7 +12,7 @@ import java.util.UUID;
 @Table(name = "messages")
 public class Message extends BaseUpdatableEntity{
     @Column(name = "content", columnDefinition = "TEXT")
-    private String text;
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
@@ -31,24 +29,19 @@ public class Message extends BaseUpdatableEntity{
             joinColumns = @JoinColumn(name = "message_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id")
     )
-    private List<BinaryContent> attachments = new ArrayList<>();
+    private final List<BinaryContent> attachments = new ArrayList<>();
 
     public Message(User author, String text, Channel channel) {
         this.author = author;
-        this.text = text;
+        this.content = text;
         this.channel = channel;
     }
 
     public void updateMessage(String newText){
-        this.text = newText;
+        this.content = newText;
     }
 
     public void addAttachment(BinaryContent attachment){
         attachments.add(attachment);
-    }
-
-    @Override
-    public String toString() {
-        return this.getText();
     }
 }

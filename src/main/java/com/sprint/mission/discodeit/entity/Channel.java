@@ -18,22 +18,22 @@ import java.util.UUID;
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
     @Column(name = "channel_name")
-    private String channelName;
+    private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "channel_type", nullable = false)
-    private ChannelType channelType;
+    private ChannelType type;
 
     @Column(name = "description")
     private String description;
 
     public Channel(String channelName, String description) {
-        this.channelName = channelName;
+        this.name = channelName;
         this.description = description;
     }
 
     public void updateChannel(String newChannelName, String newDescriptionn) {
-        this.channelName = newChannelName;
+        this.name = newChannelName;
         this.description = newDescriptionn;
     }
 }
