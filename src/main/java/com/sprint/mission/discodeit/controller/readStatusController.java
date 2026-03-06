@@ -37,7 +37,7 @@ public class readStatusController {
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable("readStatusId") UUID id,
                                                           @RequestBody ReadStatusUpdateRequest request){
-        ReadStatusDto response = readStatusService.update(id);
+        ReadStatusDto response = readStatusService.update(id,request.getNewLastReadAt());
         return ResponseEntity.ok(response);
     }
 }

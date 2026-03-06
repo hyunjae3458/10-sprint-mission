@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public UserStatusResponseDto create(UserStatusCreateDto dto) {
+    public UserStatusDto create(UserStatusCreateDto dto) {
         UUID userId = dto.getUserId();
         // 관련된 사용자가 없다면 예외처리
         User user = userRepository.findById(userId)
@@ -48,7 +47,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserStatusResponseDto findUserStatus(UUID id) {
+    public UserStatusDto findUserStatus(UUID id) {
         UserStatus userStatus = getUserStatus(id);
 
         return userStatusMapper.toDto(userStatus);
@@ -56,7 +55,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserStatusResponseDto> findAll() {
+    public List<UserStatusDto> findAll() {
         return userStatusRepository.findAll().stream()
                             .map(userStatusMapper::toDto)
                             .toList();
@@ -64,7 +63,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public UserStatusResponseDto update(UUID userId, UserStatusUpdateRequest request) {
+    public UserStatusDto update(UUID userId, UserStatusUpdateRequest request) {
         // 수정할 객체 불러옴
         UserStatus userStatus = getUserStatus(userId);
         // 최신 접속 시간 업데이트
@@ -74,6 +73,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         userStatusRepository.deleteById(id);
     }

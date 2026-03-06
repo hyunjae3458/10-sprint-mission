@@ -12,8 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "messages")
-public class Message extends BaseEntity{
-    @Column(name = "text", columnDefinition = "TEXT")
+public class Message extends BaseUpdatableEntity{
+    @Column(name = "content", columnDefinition = "TEXT")
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)

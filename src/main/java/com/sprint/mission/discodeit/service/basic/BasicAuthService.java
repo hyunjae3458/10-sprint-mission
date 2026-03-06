@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.authDto.UserLoginRequestDto;
-import com.sprint.mission.discodeit.dto.authDto.UserLoginResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.WrongPasswordException;
-import com.sprint.mission.discodeit.mapper.LoginMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
-    private final LoginMapper loginMapper;
+    private final UserMapper userMapper;
 
     @Override
-    public UserLoginResponseDto login(UserLoginRequestDto dto) {
+    public UserDto login(UserLoginRequestDto dto) {
         // 이름과 일치하는 객체 찾기
         User user = userRepository.findByName(dto.getUsername())
                 .orElseThrow(()->new UserNotFoundException(dto.getUsername()));
@@ -27,6 +27,6 @@ public class BasicAuthService implements AuthService {
             throw new WrongPasswordException();
         }
 
-        return loginMapper.toDto(user,true);
+        return userMapper.toDto(user,true);
     }
 }

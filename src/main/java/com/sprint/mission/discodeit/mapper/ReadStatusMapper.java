@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Component
 public class ReadStatusMapper {
     public ReadStatusDto toDto(ReadStatus readStatus){

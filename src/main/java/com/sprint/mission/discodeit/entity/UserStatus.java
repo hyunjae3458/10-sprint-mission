@@ -11,22 +11,22 @@ import java.util.UUID;
 @Entity
 @Table(name = "user_statuses")
 @NoArgsConstructor
-public class UserStatus extends BaseEntity{
+public class UserStatus extends BaseUpdatableEntity{
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", unique = true)
     private  User user;
 
-    @Column(name = "last_online_at")
-    private Instant lastOnlineAt;
+    @Column(name = "last_active_at")
+    private Instant lastActiveAt;
 
     public UserStatus(User user){
         this.user = user;
-        this.lastOnlineAt = Instant.now();
+        this.lastActiveAt = Instant.now();
     }
 
     // 최신 접속 시간 갱신
     public void updateAccessTime(Instant newLastActivateAt){
-        this.lastOnlineAt = newLastActivateAt;
+        this.lastActiveAt = newLastActivateAt;
     }
 
 }

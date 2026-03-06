@@ -18,23 +18,23 @@ import java.util.UUID;
         uniqueConstraints = {
                 @UniqueConstraint(
                         // 제약조건 이름
-                        name = "unique_author_channel",
+                        name = "unique_user_channel",
                         // 제약조건 테이블의 컬럼 이름
-                        columnNames = { "author_id", "channel_id" }
+                        columnNames = { "user_id", "channel_id" }
                 )
         }
 )
 @NoArgsConstructor
-public class ReadStatus extends BaseEntity{
+public class ReadStatus extends BaseUpdatableEntity{
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
-    @Column(name = "last_read_time", nullable = false)
+    @Column(name = "last_read_at", nullable = false)
     private Instant lastReadTime;
 
     public ReadStatus(User user, Channel channel){
@@ -43,7 +43,7 @@ public class ReadStatus extends BaseEntity{
         this.lastReadTime = Instant.now();
     }
 
-    public void updateLastReadTime(){
-        this.lastReadTime = Instant.now();
+    public void updateLastReadTime(Instant newLastReadTime){
+        this.lastReadTime = newLastReadTime;
     }
 }

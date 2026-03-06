@@ -126,6 +126,8 @@ public class BasicChannelService implements ChannelService {
         // 메시지 관련 바이너리 파일들도 삭제하기 위해 메시지를 먼저 삭제한다
         List<Message> messages = messageRepository.findAllByChannel(channel);
         messageRepository.deleteAll(messages);
+
+        channelRepository.delete(channel);
     }
 
     private Channel getChannel(UUID channelId){

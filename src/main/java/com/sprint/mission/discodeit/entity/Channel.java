@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "channels")
-public class Channel extends BaseEntity {
+public class Channel extends BaseUpdatableEntity {
     @Column(name = "channel_name")
     private String channelName;
 

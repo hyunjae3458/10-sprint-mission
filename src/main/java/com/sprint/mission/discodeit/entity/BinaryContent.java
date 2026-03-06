@@ -16,17 +16,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "binary_contents")
 @NoArgsConstructor
-public class BinaryContent implements Serializable {
-    private static final long serialVersionUID = 1L;
-    @Id
-    private UUID id;
+public class BinaryContent extends BaseEntity{
 
     @Column(name = "size")
     private long size;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
 
     @Column(name = "bytes")
     private byte[] bytes;
@@ -38,9 +31,7 @@ public class BinaryContent implements Serializable {
     private String contentType;
 
     public BinaryContent(long size, byte[] bytes, String fileName, String contentType){
-        this.id = UUID.randomUUID();
         this.size = size;
-        this.createdAt = Instant.now();
         this.bytes = bytes;
         this.fileName = fileName;
         this.contentType = contentType;

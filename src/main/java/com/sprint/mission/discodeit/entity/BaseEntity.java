@@ -14,8 +14,7 @@ import java.util.UUID;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -23,9 +22,4 @@ public class BaseEntity implements Serializable {
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
 }

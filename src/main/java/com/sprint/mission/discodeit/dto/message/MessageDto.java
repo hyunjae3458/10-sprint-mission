@@ -17,7 +17,7 @@ public class MessageDto {
     private UUID channelId;
     private Instant createdAt;
     private Instant updatedAt;
-    private List<BinaryContentDto> attachmentIds;
+    private List<BinaryContentDto> attachments;
     private String content;
 
 }

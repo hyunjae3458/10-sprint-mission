@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -68,7 +69,7 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("해당 사용자 상태가 없습니다."));
 
-        boolean online = isOnline(userStatus.getLastOnlineAt());
+        boolean online = isOnline(userStatus.getLastActiveAt());
         return userMapper.toDto(user,online);
     }
 
@@ -82,7 +83,7 @@ public class BasicUserService implements UserService {
             return userList.stream()
                     .map(user -> {
                         boolean online = userStatusRepository.findByUserId(user.getId())
-                                .map(us -> isOnline(us.getLastOnlineAt()))
+                                .map(us -> isOnline(us.getLastActiveAt()))
                                 .orElseThrow(() -> new NoSuchElementException("해당 유저상태는 없습니다."));
                         return userMapper.toDto(user, online);
                     })
@@ -129,11 +130,6 @@ public class BasicUserService implements UserService {
         return findUser(userId);
     }
 
-
-    public void updateOnlineStatus(UUID userId, UserStatusUpdateRequest request){
-        userStatusService.update(userId,request);
-    }
-
     @Override
     @Transactional
     public void delete(UUID userId) {
@@ -149,7 +145,6 @@ public class BasicUserService implements UserService {
         }
     }
 
-    // 추후 UserStatucService로 이전
     private boolean isOnline(Instant lastOnlineAt){
         // 만약 최종접속시간이 현재시간의 5분전 이내라면 참 반환
         return lastOnlineAt.isAfter(Instant.now().minus(Duration.ofMinutes(5)));

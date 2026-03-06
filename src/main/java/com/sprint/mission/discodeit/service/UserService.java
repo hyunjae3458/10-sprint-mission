@@ -14,6 +14,5 @@ public interface UserService {
     UserDto findUser(UUID userId);
     List<UserDto> findAllUsers();
     UserDto update(UUID userId, UserUpdateRequest request, MultipartFile profile);
-    void updateOnlineStatus(UUID userId, UserStatusUpdateRequest request);
     void delete(UUID userId);
 }

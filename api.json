@@ -171,7 +171,7 @@
         "tags": [
           "Message"
         ],
-        "operationId": "getAllMessage",
+        "operationId": "findAllByMessageId",
         "parameters": [
           {
             "name": "channelId",
@@ -183,11 +183,11 @@
             }
           },
           {
-            "name": "keyword",
+            "name": "pageable",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/Pageable"
             }
           }
         ],
@@ -740,6 +740,33 @@
           }
         }
       },
+      "BinaryContentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "bytes": {
+            "type": "string",
+            "format": "byte"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          }
+        }
+      },
       "UserDto": {
         "type": "object",
         "properties": {
@@ -753,9 +780,8 @@
           "email": {
             "type": "string"
           },
-          "profileId": {
-            "type": "string",
-            "format": "uuid"
+          "profile": {
+            "$ref": "#/components/schemas/BinaryContentDto"
           },
           "createdAt": {
             "type": "string",
@@ -798,14 +824,6 @@
             "type": "string",
             "format": "uuid"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
           "channelId": {
             "type": "string",
             "format": "uuid"
@@ -839,9 +857,8 @@
             "type": "string",
             "format": "uuid"
           },
-          "authorId": {
-            "type": "string",
-            "format": "uuid"
+          "author": {
+            "$ref": "#/components/schemas/UserDto"
           },
           "channelId": {
             "type": "string",
@@ -858,8 +875,7 @@
           "attachmentIds": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/BinaryContentDto"
             }
           },
           "content": {
@@ -1025,11 +1041,10 @@
           "description": {
             "type": "string"
           },
-          "participantIds": {
+          "participants": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/UserDto"
             }
           },
           "lastMessageAt": {
@@ -1045,30 +1060,24 @@
           }
         }
       },
-      "BinaryContentDto": {
+      "Pageable": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "bytes": {
-            "type": "string",
-            "format": "byte"
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "size": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 1
           },
-          "fileName": {
-            "type": "string"
-          },
-          "contentType": {
-            "type": "string"
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

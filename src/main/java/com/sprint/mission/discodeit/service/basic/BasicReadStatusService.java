@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -72,9 +73,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     @Transactional
-    public ReadStatusDto update(UUID id) {
+    public ReadStatusDto update(UUID id, Instant newLastReadAt) {
         ReadStatus readStatus = getReadStatus(id);
-        readStatus.updateLastReadTime();
+        readStatus.updateLastReadTime(newLastReadAt);
 
         return readStatusMapper.toDto(readStatus);
     }
