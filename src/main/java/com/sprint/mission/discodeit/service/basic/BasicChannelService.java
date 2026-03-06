@@ -31,19 +31,19 @@ public class BasicChannelService implements ChannelService {
     // 공용 채널
     @Override
     @Transactional
-    public ChannelCreateResponse createPublic(PublicChannelCreateRequest request) {
+    public ChannelDto createPublic(PublicChannelCreateRequest request) {
         // 채널 생성
         Channel channel = new Channel(request.getName(), request.getDescription());
-        channel.setChannelType(ChannelType.PUBLIC);
+        channel.setType(ChannelType.PUBLIC);
         // 채널 저장
         channelRepository.save(channel);
-        return channelMapper.toCreateResponse(channel);
+        return channelMapper.toDto(channel);
     }
 
     //개인 채널
     @Override
     @Transactional
-    public ChannelCreateResponse createPrivate(PrivateChannelCreateRequest request) {
+    public ChannelDto createPrivate(PrivateChannelCreateRequest request) {
         // 채널 생성
         Channel channel = new Channel();
         // 입력으로 들어온 유저 당 readStatus도 생성 후 저장
@@ -51,9 +51,9 @@ public class BasicChannelService implements ChannelService {
                 .map(id -> userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)))
                 .forEach(user -> readStatusRepository.save(new ReadStatus(user, channel)));
 
-        channel.setChannelType(ChannelType.PRIVATE);
+        channel.setType(ChannelType.PRIVATE);
         channelRepository.save(channel);
-        return channelMapper.toCreateResponse(channel);
+        return channelMapper.toDto(channel);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class BasicChannelService implements ChannelService {
         List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
         // 공용채널 조회
         List<ChannelDto> publicList = channelRepository.findAll().stream()
-                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC)
+                .filter(channel -> channel.getType() == ChannelType.PUBLIC)
                 .map(channelMapper::toDto)
                 .toList();
 
@@ -91,7 +91,7 @@ public class BasicChannelService implements ChannelService {
                 .map(readStatus -> channelRepository.findById(readStatus.getChannel().getId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .filter(channel -> channel.getChannelType() == ChannelType.PRIVATE)
+                .filter(channel -> channel.getType() == ChannelType.PRIVATE)
                 .map(channelMapper::toDto)
                 .toList();
 
@@ -107,7 +107,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest dto) {
         Channel channel = getChannel(channelId);
-        if(channel.getChannelType() == ChannelType.PRIVATE){
+        if(channel.getType() == ChannelType.PRIVATE){
             throw new IllegalStateException("Private 채널은 수정할 수 없습니다");
         }
         // 채널 업데이트
