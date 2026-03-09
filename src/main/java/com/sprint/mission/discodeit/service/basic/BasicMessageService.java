@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -10,18 +11,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -31,7 +33,7 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentRepository binaryContentRepository;
+    private final PageResponseMapper pageResponseMapper;
 
 
     @Override
@@ -78,29 +80,10 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MessageDto> findMessageByKeyword(UUID channelId, String keyword) {
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+    public PageResponse<Message> findAllMessagesByChannelId(UUID channelId, Pageable pageable) {
 
-        List<MessageDto> messageList = messageRepository.findAll().stream()
-                .filter(message -> message.getChannel().equals(channel))
-                .filter(message -> message.getContent().contains(keyword))
-                .map(messageMapper::toDto)
-                .toList();
-
-        return messageList;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<MessageDto> findAllMessagesByChannelId(UUID channelId) {
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
-
-        return messageRepository.findAll().stream()
-                .filter(message -> message.getChannel().equals(channel))
-                .map(messageMapper::toDto)
-                .toList();
+        Page<Message> messageList = messageRepository.findAllByChannelId(channelId,pageable);
+        return  pageResponseMapper.fromPage(messageList);
     }
 
     @Override
