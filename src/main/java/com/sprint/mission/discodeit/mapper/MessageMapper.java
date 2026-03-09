@@ -11,17 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 
-@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
+@Mapper(componentModel = "spring", uses = {UserMapper.class,BinaryContentMapper.class})
 public abstract class MessageMapper {
     @Autowired
     protected BinaryContentMapper binaryContentMapper;
 
     @Mapping(target = "attachments", expression = "java(getBinaryContentDtoList(message))")
+    @Mapping(target = "channelId", source = "channel.id")
     public abstract MessageDto toDto(Message message);
 
-    protected List<BinaryContentDto> getBinaryContentDtoList(Message message){
-        return message.getAttachments().stream()
-                .map(binaryContentMapper::toDto)
-                .toList();
-    }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto.message;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class MessageDto {
     private UUID id;
     private UserDto author;
