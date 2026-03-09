@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,8 +43,9 @@ public class MessageController {
     // 채널 내 메시지 조회(키워드 따라 조회 가능)
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(@RequestParam(required = true) UUID channelId,
+                                                                    @RequestParam(required = false) Instant cursor,
                                                                     @PageableDefault(size = 50, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
-        return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId, pageable));
+        return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId, cursor, pageable));
     }
 
     // 메시지 업데이트

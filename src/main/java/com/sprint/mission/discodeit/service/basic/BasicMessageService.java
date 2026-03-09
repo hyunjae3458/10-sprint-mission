@@ -18,12 +18,15 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -80,12 +83,29 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Pageable pageable) {
+    public PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
 
-        Page<MessageDto> messagePage = messageRepository.findAllByChannelId(channelId,pageable)
-                .map(messageMapper::toDto);
+        // slice는 페이자(offset)이 항상 0이어야함
+        Pageable safePageable = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());
+        Slice<Message> messageSlice;
 
-        return  pageResponseMapper.fromPage(messagePage);
+        if(cursor == null){
+            messageSlice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, safePageable);
+        } else{
+            messageSlice = messageRepository.findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(channelId, cursor, safePageable);
+        }
+
+        Slice<MessageDto> dtoSlice = messageSlice.map(messageMapper::toDto);
+
+        Instant nextCursor = null;
+        if (dtoSlice.hasNext() && !dtoSlice.getContent().isEmpty()) {
+            // 데이터가 더 남아있다면, 지금 리스트의 제일 마지막(가장 오래된) 메시지의 시간을 다음 커서로 지정
+            int lastIndex = dtoSlice.getContent().size() - 1;
+            nextCursor = dtoSlice.getContent().get(lastIndex).getCreatedAt();
+        }
+
+        // 매퍼에 쏙 넣어줍니다!
+        return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
     }
 
     @Override
