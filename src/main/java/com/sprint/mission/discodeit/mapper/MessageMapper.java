@@ -16,7 +16,6 @@ public abstract class MessageMapper {
     @Autowired
     protected BinaryContentMapper binaryContentMapper;
 
-    @Mapping(target = "attachments", expression = "java(getBinaryContentDtoList(message))")
     @Mapping(target = "channelId", source = "channel.id")
     public abstract MessageDto toDto(Message message);
 
