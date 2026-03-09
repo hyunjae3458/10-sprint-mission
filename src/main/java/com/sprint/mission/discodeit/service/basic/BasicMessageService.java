@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -38,6 +39,7 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentRepository binaryContentRepository;
 
 
     @Override
@@ -61,6 +63,7 @@ public class BasicMessageService implements MessageService {
                         bc.getOriginalFilename(),
                         bc.getContentType());
                 binaryContentStorage.put(binaryContent.getId(), bc.getBytes());
+                binaryContentRepository.save(binaryContent);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

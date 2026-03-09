@@ -44,6 +44,8 @@ public class BasicUserService implements UserService {
 
                 user.addProfileImage(binaryContent);
                 // 연관성 주입
+                binaryContentRepository.save(binaryContent);
+                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
 
             } catch (Exception e) {
                 throw new RuntimeException("파일 업로드 오류가 발생했습니다",e);
