@@ -46,13 +46,14 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto createPrivate(PrivateChannelCreateRequest request) {
         // 채널 생성
         Channel channel = new Channel();
+
+        channel.setType(ChannelType.PRIVATE);
+        channelRepository.save(channel);
+
         // 입력으로 들어온 유저 당 readStatus도 생성 후 저장
         request.getParticipantIds().stream()
                 .map(id -> userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)))
                 .forEach(user -> readStatusRepository.save(new ReadStatus(user, channel)));
-
-        channel.setType(ChannelType.PRIVATE);
-        channelRepository.save(channel);
         return channelMapper.toDto(channel);
     }
 
