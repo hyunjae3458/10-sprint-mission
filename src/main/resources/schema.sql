@@ -8,7 +8,6 @@ CREATE TABLE binary_contents
     file_name    VARCHAR(225) not null,
     size         BIGINT not null ,
     content_type VARCHAR(100) not null,
-    bytes        BYTEA not null ,
     created_at   TIMESTAMPTZ NOT NULL
 );
 
@@ -61,7 +60,7 @@ CREATE TABLE messages
 CREATE TABLE message_attachments
 (
     message_id        UUID NOT NULL REFERENCES messages (id) ON DELETE CASCADE,
-    attachment_id UUID NOT NULL REFERENCES binary_contents (id) ON DELETE CASCADE,
+    attachment_id UUID NOT NULL REFERENCES binary_contents (id) ON DELETE CASCADE
 );
 
 -- 8. 읽음 시간 관리 테이블
