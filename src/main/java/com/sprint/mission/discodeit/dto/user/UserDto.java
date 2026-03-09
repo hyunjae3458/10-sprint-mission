@@ -15,8 +15,6 @@ public class UserDto {
     private String username;
     private String email;
     private BinaryContentDto profile;
-    private Instant createdAt;
-    private Instant updatedAt;
     private boolean online;
 
 }

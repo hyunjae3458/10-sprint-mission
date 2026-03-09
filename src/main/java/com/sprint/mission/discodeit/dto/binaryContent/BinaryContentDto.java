@@ -10,7 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BinaryContentDto {
     private UUID id;
-    private Instant createdAt;
     private long size;
     private String fileName;
     private String contentType;
