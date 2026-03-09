@@ -16,7 +16,7 @@ import java.util.UUID;
 public interface MessageService {
     MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments);
     MessageDto findMessage(UUID messageId);
-    PageResponse<Message> findAllMessagesByChannelId(UUID channelId, Pageable pageable);
+    PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Pageable pageable);
     MessageDto update(UUID messageId, MessageUpdateRequest dto);
     void delete(UUID messageId);
 }

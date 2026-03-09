@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,7 +41,7 @@ public class MessageController {
 
     // 채널 내 메시지 조회(키워드 따라 조회 가능)
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<Message>> findAllByChannelId(@RequestParam(required = true) UUID channelId,
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(@RequestParam(required = true) UUID channelId,
                                                                     @PageableDefault(size = 50, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId, pageable));
     }

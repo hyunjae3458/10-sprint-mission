@@ -80,10 +80,12 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<Message> findAllMessagesByChannelId(UUID channelId, Pageable pageable) {
+    public PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Pageable pageable) {
 
-        Page<Message> messageList = messageRepository.findAllByChannelId(channelId,pageable);
-        return  pageResponseMapper.fromPage(messageList);
+        Page<MessageDto> messagePage = messageRepository.findAllByChannelId(channelId,pageable)
+                .map(messageMapper::toDto);
+
+        return  pageResponseMapper.fromPage(messagePage);
     }
 
     @Override
