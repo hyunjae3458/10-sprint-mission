@@ -21,18 +21,14 @@ public class BinaryContent extends BaseEntity{
     @Column(name = "size")
     private long size;
 
-    @Column(name = "bytes")
-    private byte[] bytes;
-
     @Column(name = "file_name")
     private String fileName;
 
     @Column(name = "content_type")
     private String contentType;
 
-    public BinaryContent(long size, byte[] bytes, String fileName, String contentType){
+    public BinaryContent(long size, String fileName, String contentType){
         this.size = size;
-        this.bytes = bytes;
         this.fileName = fileName;
         this.contentType = contentType;
     }

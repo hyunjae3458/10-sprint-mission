@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusService userStatusService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     @Transactional
@@ -41,7 +42,6 @@ public class BasicUserService implements UserService {
             try{
                 BinaryContent binaryContent = new BinaryContent(
                     profile.getSize(),
-                    profile.getBytes(),
                     profile.getOriginalFilename(),
                     profile.getContentType());
 
@@ -114,10 +114,10 @@ public class BasicUserService implements UserService {
             try{
                 BinaryContent newBinaryContent = new BinaryContent(
                         profile.getSize(),
-                        profile.getBytes(),
                         profile.getOriginalFilename(),
                         profile.getContentType());
                 binaryContentRepository.save(newBinaryContent);
+                binaryContentStorage.put(newBinaryContent.getId(), profile.getBytes());
 
                 user.updateProfileImg(newBinaryContent);
             } catch (Exception e) {

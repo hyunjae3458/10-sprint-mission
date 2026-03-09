@@ -11,7 +11,6 @@ import java.util.UUID;
 public class BinaryContentDto {
     private UUID id;
     private Instant createdAt;
-    private byte[] bytes;
     private long size;
     private String fileName;
     private String contentType;

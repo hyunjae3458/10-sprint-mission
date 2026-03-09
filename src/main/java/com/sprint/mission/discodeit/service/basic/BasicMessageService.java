@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
 
     @Override
@@ -57,9 +59,9 @@ public class BasicMessageService implements MessageService {
             try {
                 binaryContent = new BinaryContent(
                         bc.getSize(),
-                        bc.getBytes(),
                         bc.getOriginalFilename(),
                         bc.getContentType());
+                binaryContentStorage.put(binaryContent.getId(), bc.getBytes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
