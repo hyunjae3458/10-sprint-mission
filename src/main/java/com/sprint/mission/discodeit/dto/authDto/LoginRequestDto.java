@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.authDto;
 import lombok.Getter;
 
 @Getter
-public class UserLoginRequestDto {
+public class LoginRequestDto {
     private String username;
     private String password;
 }

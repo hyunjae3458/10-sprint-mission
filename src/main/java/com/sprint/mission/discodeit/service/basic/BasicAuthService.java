@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.authDto.UserLoginRequestDto;
+import com.sprint.mission.discodeit.dto.authDto.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
@@ -18,7 +18,7 @@ public class BasicAuthService implements AuthService {
     private final UserMapper userMapper;
 
     @Override
-    public UserDto login(UserLoginRequestDto dto) {
+    public UserDto login(LoginRequestDto dto) {
         // 이름과 일치하는 객체 찾기
         User user = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(()->new UserNotFoundException(dto.getUsername()));
