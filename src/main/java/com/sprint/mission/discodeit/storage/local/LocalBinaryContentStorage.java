@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,6 +29,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         this.root = Paths.get(rootPath);
     }
 
+
+    @PostConstruct
     public void init() {
         try {
             Files.createDirectories(root);
