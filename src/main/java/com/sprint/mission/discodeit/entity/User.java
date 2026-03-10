@@ -22,6 +22,9 @@ public class User extends BaseUpdatableEntity{
     @Column(name = "password", nullable = false)
     private String password;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus userStatus;
+
     public User(String name, String email, String password){
         this.username = name;
         this.email = email;
