@@ -1,3 +1,15 @@
+-- 0. 기존 테이블 및 타입 초기화
+DROP TABLE IF EXISTS read_statuses CASCADE;
+DROP TABLE IF EXISTS message_attachments CASCADE;
+DROP TABLE IF EXISTS messages CASCADE;
+DROP TABLE IF EXISTS user_statuses CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS channels CASCADE;
+DROP TABLE IF EXISTS binary_contents CASCADE;
+
+-- ENUM 타입 삭제
+DROP TYPE IF EXISTS ChannelType CASCADE;
+
 -- 1. Enum 타입 생성
 CREATE TYPE ChannelType AS ENUM ('PRIVATE', 'PUBLIC');
 
