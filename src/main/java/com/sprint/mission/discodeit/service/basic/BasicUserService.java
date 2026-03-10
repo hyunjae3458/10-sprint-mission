@@ -110,6 +110,7 @@ public class BasicUserService implements UserService {
         }
         // 프로필 수정(기존에 있던 binaryContent를 삭제하고 업데이트 dto에 있는 binaryContent를 생성
         if(profile != null){
+            if(user.getProfile() != null) binaryContentRepository.delete(user.getProfile());
             try{
                 BinaryContent newBinaryContent = new BinaryContent(
                         profile.getSize(),
