@@ -1,20 +1,22 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-public class MessageMapper {
-    public MessageDto toDto(Message message){
-        if(message == null) return null;
+import java.util.List;
 
-        return new MessageDto(message.getId(),
-                message.getUserId(),
-                message.getChannelId(),
-                message.getCreatedAt(),
-                message.getUpdatedAt(),
-                message.getBinaryContentList(),
-                message.getText());
-    }
+
+@Mapper(componentModel = "spring", uses = {UserMapper.class,BinaryContentMapper.class})
+public abstract class MessageMapper {
+    @Autowired
+    protected BinaryContentMapper binaryContentMapper;
+
+    @Mapping(target = "channelId", source = "channel.id")
+    public abstract MessageDto toDto(Message message);
+
 }

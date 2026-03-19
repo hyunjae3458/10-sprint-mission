@@ -1,37 +1,44 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.service.MessageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 
-@Component
-@RequiredArgsConstructor
-public class ChannelMapper {
-    private final MessageService messageService;
+@Mapper(componentModel = "spring", uses = {UserService.class, ReadStatusRepository.class, MessageRepository.class})
+public abstract class ChannelMapper {
+    @Autowired
+    protected  ReadStatusRepository readStatusRepository;
+    @Autowired
+    protected  MessageRepository messageRepository;
+    @Autowired
+    private UserService userService;
 
-    public ChannelDto toDto(Channel channel){
-        if(channel == null) return null;
+    @Mapping(target = "lastMessageAt", expression = "java(getLatestMessageTime(channel.getId()))")
+    @Mapping(target = "participants", expression = "java(getParticipants(channel.getId()))")
+    public abstract ChannelDto toDto(Channel channel);
 
-        return new ChannelDto(channel.getId(),
-                channel.getChannelName(),
-                channel.getDescription(),
-                channel.getUserList(),
-                channel.getLastMessageAt(),
-                channel.getChannelType());
+    protected Instant getLatestMessageTime(UUID channelId){
+        // 가장 최근 메시지 찾기
+       return messageRepository.findFirstByChannelIdOrderByCreatedAtDesc(channelId)
+               .map(BaseEntity::getCreatedAt)
+               .orElse(null);
     }
 
-    public ChannelCreateResponse toCreateResponse(Channel channel){
-        if(channel == null) return null;
-
-        return new ChannelCreateResponse(channel.getId(),
-                channel.getCreatedAt(),
-                channel.getUpdatedAt(),
-                channel.getChannelType(),
-                channel.getChannelName(),
-                channel.getDescription());
+    protected List<UserDto> getParticipants(UUID channelId){
+        return readStatusRepository.findAllByChannelId(channelId).stream()
+                .map(readStatus -> userService.findUser(readStatus.getUser().getId()))
+                .toList();
     }
 }

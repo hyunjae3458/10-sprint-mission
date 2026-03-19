@@ -13,9 +13,6 @@ public interface UserService {
     UserDto create(UserCreateRequest request, MultipartFile profile);
     UserDto findUser(UUID userId);
     List<UserDto> findAllUsers();
-    UserDto addFriend(UUID senderId, UUID recieverId);
-    List<UserDto> findFriends(UUID userId);
     UserDto update(UUID userId, UserUpdateRequest request, MultipartFile profile);
-    void updateOnlineStatus(UUID userId, UserStatusUpdateRequest request);
     void delete(UUID userId);
 }

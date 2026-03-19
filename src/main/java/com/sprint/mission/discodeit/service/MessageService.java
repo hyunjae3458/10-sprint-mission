@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
@@ -12,8 +14,7 @@ import java.util.UUID;
 public interface MessageService {
     MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments);
     MessageDto findMessage(UUID messageId);
-    List<MessageDto> findMessageByKeyword(UUID channelId, String keyword);
-    List<MessageDto> findAllMessagesByChannelId(UUID channelId);
+    PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId,Instant cursor, Pageable pageable);
     MessageDto update(UUID messageId, MessageUpdateRequest dto);
     void delete(UUID messageId);
 }

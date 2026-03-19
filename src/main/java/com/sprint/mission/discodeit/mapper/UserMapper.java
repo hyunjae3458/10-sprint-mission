@@ -2,19 +2,13 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class UserMapper {
-    public UserDto toDto(User user, boolean online){
-        if(user == null) return null;
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
+public interface UserMapper {
 
-        return new UserDto(user.getId()
-                ,user.getName()
-                ,user.getEmail()
-                ,user.getProfileImageId()
-                ,user.getCreatedAt()
-                ,user.getUpdatedAt()
-                ,online );
-    }
+    @Mapping(target = "profile", source = "user.profile")
+    UserDto toDto(User user, boolean online);
+
 }

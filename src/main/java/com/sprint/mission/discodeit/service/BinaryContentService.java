@@ -8,9 +8,7 @@ import java.util.UUID;
 
 public interface BinaryContentService {
     BinaryContentDto create(BinaryContentCreateRequest dto);
-    BinaryContentDto findId(UUID id);
-//    BinaryContentDto findBinaryContentByUserId(UUID id);
-    List<BinaryContentDto> findAllIdIn(List<UUID> binaryContentId);
-//    List<BinaryContent> findAllByMessageId(UUID messageId);
+    BinaryContentDto findBinaryContent(UUID id);
+    List<BinaryContentDto> findAllIdIn(List<UUID> binaryContentIds);
     void delete(UUID id);
 }

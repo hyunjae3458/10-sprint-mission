@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +17,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
     // 단건 조회
     @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
     public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable("binaryContentId") UUID id){
-        BinaryContentDto response = binaryContentService.findId(id);
+        BinaryContentDto response = binaryContentService.findBinaryContent(id);
         return ResponseEntity.ok(response);
     }
 
@@ -32,17 +33,9 @@ public class BinaryContentController {
         return ResponseEntity.ok(responseList);
     }
 
-//    // 프로필 조회
-//    @RequestMapping(value = "/user/{user-id}", method = RequestMethod.GET)
-//    public ResponseEntity<BinaryContent> getProfileImg(@PathVariable("user-id") UUID userId){
-//        BinaryContent response = binaryContentService.findBinaryContentByUserId(userId);
-//        return ResponseEntity.ok(response);
-//    }
-//
-//    // 메시지 첨부파일 조회
-//    @RequestMapping(value = "/message/{message-id}", method = RequestMethod.GET)
-//    public ResponseEntity<List<BinaryContent>> getAllMessageBinaryContent(@PathVariable("message-id") UUID messageId){
-//        List<BinaryContent> responseList = binaryContentService.findAllByMessageId(messageId);
-//        return ResponseEntity.ok(responseList);
-//    }
+    @RequestMapping(value = "/{binaryContentId}/download", method = RequestMethod.GET)
+    public ResponseEntity<?> download(@PathVariable("binaryContentId") UUID id){
+
+        return binaryContentStorage.download(binaryContentService.findBinaryContent(id));
+    }
 }

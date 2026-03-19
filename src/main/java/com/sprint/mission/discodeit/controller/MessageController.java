@@ -3,17 +3,22 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,23 +39,12 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 메시지 단건 조회
-//    @RequestMapping(value = "/message/{id}", method = RequestMethod.GET)
-//    public ResponseEntity<MessageDto> getMessage(@PathVariable UUID id){
-//        MessageDto response = messageService.findMessage(id);
-//        return ResponseEntity.ok(response);
-//    }
-
     // 채널 내 메시지 조회(키워드 따라 조회 가능)
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<MessageDto>> getAllMessage(@RequestParam(required = true) UUID channelId,
-                                                          @RequestParam(required = false) String keyword){
-        if(keyword == null){
-            return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId));
-        } else{
-            return ResponseEntity.ok(messageService.findMessageByKeyword(channelId,keyword));
-        }
-
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(@RequestParam(required = true) UUID channelId,
+                                                                    @RequestParam(required = false) Instant cursor,
+                                                                    @PageableDefault(size = 50, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+        return ResponseEntity.ok(messageService.findAllMessagesByChannelId(channelId, cursor, pageable));
     }
 
     // 메시지 업데이트

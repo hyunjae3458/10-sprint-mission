@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class ChannelDto {
     private UUID id;
     private String name;
     private String description;
-    private List<UUID> participantIds;
+    private List<UserDto> participants;
     private Instant lastMessageAt;
     private ChannelType type;
 }
