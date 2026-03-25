@@ -11,6 +11,14 @@ spring:
     properties:
       hibernate:
         format_sql: true # SQL ??? ???
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-h2.sql
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 logging:
   level:
     root: info
