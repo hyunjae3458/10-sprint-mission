@@ -18,7 +18,6 @@ public class Channel extends BaseUpdatableEntity {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "channel_type", nullable = false)
     private ChannelType type;
 
