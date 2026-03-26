@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusExistException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -91,6 +92,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private ReadStatus getReadStatus(UUID id){
         return readStatusRepository.findById(id)
-                .orElseThrow(ReadStatusExistException::new);
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
     }
 }

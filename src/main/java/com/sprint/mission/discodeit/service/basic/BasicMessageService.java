@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.file.FileUploadFailException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -69,8 +69,7 @@ public class BasicMessageService implements MessageService {
                 binaryContentRepository.save(binaryContent);
                 binaryContentStorage.put(binaryContent.getId(), bc.getBytes());
             } catch (IOException e) {
-                log.error("파일 업로드 실패: 파일 이름 = {}",bc.getOriginalFilename(),e);
-                throw new RuntimeException(e);
+                throw new FileUploadFailException();
             }
             message.addAttachment(binaryContent);
             // 바이너리 컨텐츠는 조인 테이블의 casecade.All로 인해서 저장안해도됨
