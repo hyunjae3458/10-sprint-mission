@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -112,7 +113,6 @@ public class BasicMessageService implements MessageService {
             nextCursor = dtoSlice.getContent().get(lastIndex).getCreatedAt();
         }
 
-        // 매퍼에 쏙 넣어줍니다!
         return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
     }
 
@@ -140,7 +140,7 @@ public class BasicMessageService implements MessageService {
     // 유효성 검사
     private Message getMessage(UUID messageId){
         return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("해당 메시자가 없습니다."));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
     }
 
 }

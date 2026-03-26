@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusExistException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -35,7 +37,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
         // 해당 사용자가 이미 userStatus를 가지고 있다면 예외처리
         if(userStatusRepository.existsByUserId(userId)){
-            throw new IllegalStateException("이미 존재하는 유저입니다");
+            throw new UserStatusExistException(userId);
         }
 
         // 만약 예외가 없다면 객체 생성
@@ -80,6 +82,6 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     private UserStatus getUserStatus(UUID id){
-        return userStatusRepository.findByUserId(id).orElseThrow(() -> new NoSuchElementException("해당 유저상태가 없습니다."));
+        return userStatusRepository.findByUserId(id).orElseThrow(() -> new UserStatusNotFoundException(id));
     }
 }

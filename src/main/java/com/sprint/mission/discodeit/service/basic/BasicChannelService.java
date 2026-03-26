@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -60,7 +61,7 @@ public class BasicChannelService implements ChannelService {
         request.getParticipantIds().stream()
                 .map(id -> userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)))
                 .forEach(user -> readStatusRepository.save(new ReadStatus(user, channel)));
-        log.trace("개인 채널 생성 성공: 채널 id = {}", channel.getId());
+        log.info("개인 채널 생성 성공: 채널 id = {}", channel.getId());
         return channelMapper.toDto(channel);
     }
 
@@ -76,7 +77,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     public List<ChannelDto> findAllChannels() {
         List<Channel> channelList = channelRepository.findAll();
-        log.info("채널 목록 조회 성공: 채널 수 = {}", channelList.size());
+        log.trace("채널 목록 조회 성공: 채널 수 = {}", channelList.size());
         // n + 1 문제 수정해야함
         return channelList.stream()
                 .map(channelMapper::toDto)
@@ -145,6 +146,6 @@ public class BasicChannelService implements ChannelService {
 
     private Channel getChannel(UUID channelId){
         return channelRepository.findById(channelId)
-                .orElseThrow(()->new NoSuchElementException("해당 채널을 찾을 수 없습니다"));
+                .orElseThrow(()->new ChannelNotFoundException(channelId));
     }
 }

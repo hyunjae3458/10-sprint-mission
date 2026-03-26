@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.others.FileUploadFailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailFoundException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
@@ -60,8 +61,7 @@ public class BasicUserService implements UserService {
                         request.getEmail(), binaryContent.getId(), binaryContent.getFileName());
 
             } catch (Exception e) {
-                log.error("파일 업로드 실패: 유저 email = {}, 파일 이름 = {}",request.getEmail(), profile.getOriginalFilename(),e);
-                throw new RuntimeException("파일 업로드 오류가 발생했습니다",e);
+                throw new FileUploadFailException();
             }
         }
         // 유저 저장
@@ -80,7 +80,7 @@ public class BasicUserService implements UserService {
     public UserDto findUser(UUID userId) {
         User user = getUser(userId);
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자 상태가 없습니다."));
+                .orElseThrow(() -> new UserStatusNotFoundException(userId));
 
         boolean online = isOnline(userStatus.getLastActiveAt());
         log.trace("유저 조회 성공: 사용자 id = {}, 이름 = {}, 온라인 상태 = {}",user.getId(), user.getUsername(), online);
@@ -98,7 +98,7 @@ public class BasicUserService implements UserService {
                         // n + 1 문제 지점
                         boolean online = userStatusRepository.findByUserId(user.getId())
                                 .map(us -> isOnline(us.getLastActiveAt()))
-                                .orElseThrow(() -> new NoSuchElementException("해당 유저상태는 없습니다."));
+                                .orElseThrow(() -> new UserStatusNotFoundException(user.getId()));
                         return userMapper.toDto(user, online);
                     })
                     .toList();
@@ -136,13 +136,10 @@ public class BasicUserService implements UserService {
                         profile.getContentType());
                 binaryContentRepository.save(newBinaryContent);
                 binaryContentStorage.put(newBinaryContent.getId(), profile.getBytes());
-                log.info("유저 프로필 수정 성공: 유저 id = {}, 파일 id = {}, 파일 이름 = {}"
-                        , userId, newBinaryContent.getId(), newBinaryContent.getFileName());
 
                 user.updateProfileImg(newBinaryContent);
             } catch (Exception e) {
-                log.error("파일 업로드 실패: 유저 id = {}, 파일 이름 = {}", userId, profile.getOriginalFilename(),e);
-                throw new RuntimeException("파일 업로드 오류가 발생했습니다",e);
+                throw new FileUploadFailException();
             }
         }
         log.info("유저 정보 수정 성공: 유저 id = {}", userId);
