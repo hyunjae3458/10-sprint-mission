@@ -7,8 +7,10 @@ import java.util.UUID;
 @Getter
 public class ChannelNotFoundException extends RuntimeException{
     private final UUID channelId;
-    public ChannelNotFoundException(UUID channelId) {
-        super("Channel with id " + channelId + " not found");
+    private final ErrorCode errorCode;
+    public ChannelNotFoundException(UUID channelId,ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.channelId = channelId;
+        this.errorCode = errorCode;
     }
 }

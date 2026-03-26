@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -31,7 +32,7 @@ public class BasicUserStatusService implements UserStatusService {
         UUID userId = dto.getUserId();
         // 관련된 사용자가 없다면 예외처리
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId, ErrorCode.USER_NOT_FOUND));
         // 해당 사용자가 이미 userStatus를 가지고 있다면 예외처리
         if(userStatusRepository.existsByUserId(userId)){
             throw new IllegalStateException("이미 존재하는 유저입니다");

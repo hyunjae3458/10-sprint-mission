@@ -9,16 +9,19 @@ import java.util.UUID;
 public class UserNotFoundException extends  RuntimeException{
     private final String username;
     private final UUID userId;
+    private final ErrorCode errorCode;
 
-    public UserNotFoundException(String username) {
-        super("User with username " + username + " not found");
+    public UserNotFoundException(String username, ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.username = username;
         this.userId = null;
+        this.errorCode = errorCode;
     }
 
-    public UserNotFoundException(UUID userId) {
-        super("User with id " + userId + " not found");
+    public UserNotFoundException(UUID userId, ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.username = null;
         this.userId = userId;
+        this.errorCode = errorCode;
     }
 }

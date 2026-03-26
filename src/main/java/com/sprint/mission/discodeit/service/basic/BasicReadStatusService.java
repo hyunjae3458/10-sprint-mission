@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -37,9 +38,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
         // userId, channelId가 null이라면 예외
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId, ErrorCode.USER_NOT_FOUND));
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId, ErrorCode.CHANNEL_NOT_FOUND));
 
         // 중복된게 없다면 생성
         if(!readStatusRepository.existsByUserIdAndChannelId(userId,channelId)){

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.DuplicateEmailFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
@@ -35,7 +36,7 @@ public class BasicUserService implements UserService {
     public UserDto create(UserCreateRequest request, MultipartFile profile) {
         // 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateEmailFoundException(request.getEmail());
+            throw new DuplicateEmailFoundException(request.getEmail(), ErrorCode.DUPLICATE_EMAIL);
         }
 
         // 유저 객체 생성
@@ -82,7 +83,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException("해당 사용자 상태가 없습니다."));
 
         boolean online = isOnline(userStatus.getLastActiveAt());
-        log.debug("유저 조회 성공: 사용자 id = {}, 이름 = {}, 온라인 상태 = {}",user.getId(), user.getUsername(), online);
+        log.trace("유저 조회 성공: 사용자 id = {}, 이름 = {}, 온라인 상태 = {}",user.getId(), user.getUsername(), online);
         return userMapper.toDto(user,online);
     }
 
@@ -90,7 +91,6 @@ public class BasicUserService implements UserService {
     @Transactional(readOnly = true)
     public List<UserDto> findAllUsers() {
         List<User> userList = userRepository.findAll();
-        log.debug("전체 유저 목록 조회 요청: 조회된 유저 수 = {}", userList.size());
         if(!userList.isEmpty()){
             // 가져온 객체들을 dto로 변환
             return userList.stream()
@@ -118,7 +118,7 @@ public class BasicUserService implements UserService {
         // 이메일 수정
         if(request.getNewEmail() != null){
             if(userRepository.existsByEmail(request.getNewEmail())){
-                throw new DuplicateEmailFoundException(request.getNewEmail());
+                throw new DuplicateEmailFoundException(request.getNewEmail(),ErrorCode.DUPLICATE_EMAIL);
             }
             user.updateEmail(request.getNewEmail());
         }
@@ -173,6 +173,6 @@ public class BasicUserService implements UserService {
     // 유효성 검사
     private User getUser(UUID userId){
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId, ErrorCode.USER_NOT_FOUND));
     }
 }

@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -48,9 +49,9 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments) {
         User user = userRepository.findById(request.getAuthorId())
-                .orElseThrow(() -> new UserNotFoundException(request.getAuthorId()));
+                .orElseThrow(() -> new UserNotFoundException(request.getAuthorId(), ErrorCode.USER_NOT_FOUND));
         Channel channel = channelRepository.findById(request.getChannelId())
-                .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId()));
+                .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId(),ErrorCode.CHANNEL_NOT_FOUND));
         // 메시지 객체 생성
         Message message = new Message(user,request.getContent(),channel);
         if(attachments == null){
@@ -84,7 +85,7 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     public MessageDto findMessage(UUID messageId) {
         Message message = getMessage(messageId);
-        log.info("메시지 조회 성공: 메시지 id = {}", messageId);
+        log.trace("메시지 조회 성공: 메시지 id = {}", messageId);
         return messageMapper.toDto(message);
     }
 

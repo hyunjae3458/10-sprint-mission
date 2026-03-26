@@ -8,8 +8,10 @@ import java.util.UUID;
 @Getter
 public class PrivateChannelUpdateException extends RuntimeException {
     private final UUID channelId;
-    public PrivateChannelUpdateException(UUID channelId) {
-        super("can't update channel with channelId: " + channelId);
+    private final ErrorCode errorCode;
+    public PrivateChannelUpdateException(UUID channelId, ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
         this.channelId = channelId;
     }
 }

@@ -18,35 +18,35 @@ public class GlobalExceptionHandler {
         } else {
             log.warn("유저 로그인 실패: 로그인 유저 이름 = {}", e.getUsername(),e);
         }
-        ErrorResponse response = new ErrorResponse("USER_NOT_FOUND", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getErrorCode(), e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(WrongPasswordException.class)
     public ResponseEntity<ErrorResponse> handleWrongPasswordException(WrongPasswordException e){
         log.warn("잘못된 비밀번호 요청",e);
-        ErrorResponse response = new ErrorResponse("WRONG_PASSWORD",e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getErrorCode(),e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(ChannelNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleChannelNotFoundException(ChannelNotFoundException e){
         log.warn("유저 조회 실패: 조회 채널 id = {}", e.getChannelId(),e);
-        ErrorResponse response = new ErrorResponse("CHANNEL_NOT_FOUND",e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getErrorCode(),e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(DuplicateEmailFoundException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEmailFoundException(DuplicateEmailFoundException e){
         log.warn("이미 사용 중인 이메일 = {}", e.getEmail(),e);
-        ErrorResponse response = new ErrorResponse("DUPLICATE_EMAIL", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getErrorCode(), e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(PrivateChannelUpdateException.class)
     public ResponseEntity<ErrorResponse> handlePrivateChannelUpdateException(PrivateChannelUpdateException e){
         log.warn("개인 채널 수정 실패: channelId = {}", e.getChannelId(),e);
-        ErrorResponse response = new ErrorResponse("PRIVATE_CHANNEL_UPDATE", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getErrorCode(), e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -57,9 +58,9 @@ public class BasicChannelService implements ChannelService {
         // 입력으로 들어온 유저 당 readStatus도 생성 후 저장
         // n+1 수정해야함
         request.getParticipantIds().stream()
-                .map(id -> userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)))
+                .map(id -> userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id,ErrorCode.USER_NOT_FOUND)))
                 .forEach(user -> readStatusRepository.save(new ReadStatus(user, channel)));
-        log.info("개인 채널 생성 성공: 채널 id = {}", channel.getId());
+        log.trace("개인 채널 생성 성공: 채널 id = {}", channel.getId());
         return channelMapper.toDto(channel);
     }
 
@@ -86,7 +87,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     public List<ChannelDto> findAllChannelsByUserId(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId,ErrorCode.USER_NOT_FOUND));
 
         List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
         // 공용채널 조회
@@ -120,7 +121,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest dto) {
         Channel channel = getChannel(channelId);
         if(channel.getType() == ChannelType.PRIVATE){
-            throw new PrivateChannelUpdateException(channelId);
+            throw new PrivateChannelUpdateException(channelId, ErrorCode.PRIVATE_CHANNEL_UPDATE);
         }
         // 채널 업데이트
         channel.updateChannel(dto.getNewName(),dto.getNewDescription());
