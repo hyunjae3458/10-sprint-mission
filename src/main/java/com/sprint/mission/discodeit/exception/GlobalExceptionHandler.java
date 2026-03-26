@@ -17,10 +17,9 @@ import java.time.Instant;
 public class GlobalExceptionHandler {
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e){
-
         log.warn("예외 발생: 메시지 = {}",e.getErrorCode().getMessage(), e);
         ErrorResponse response = new ErrorResponse(
-                Instant.now(),
+                e.getTimestamp(),
                 e.getErrorCode().getCode(),
                 e.getErrorCode().getMessage(),
                 e.getDetails(),
