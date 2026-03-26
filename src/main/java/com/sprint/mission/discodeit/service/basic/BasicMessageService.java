@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -32,6 +33,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
@@ -65,6 +67,7 @@ public class BasicMessageService implements MessageService {
                 binaryContentRepository.save(binaryContent);
                 binaryContentStorage.put(binaryContent.getId(), bc.getBytes());
             } catch (IOException e) {
+                log.error("파일 업로드 실패: 파일 이름 = {}",bc.getOriginalFilename(),e);
                 throw new RuntimeException(e);
             }
             message.addAttachment(binaryContent);
@@ -73,7 +76,7 @@ public class BasicMessageService implements MessageService {
 
         // 데이터에 정보 저장
         messageRepository.save(message);
-
+        log.info("메시지 생성 성공: 메시지 id = {}, 첨부파일 수 = {}", message.getId(), attachments.size());
         return messageMapper.toDto(message);
     }
 
@@ -81,7 +84,7 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     public MessageDto findMessage(UUID messageId) {
         Message message = getMessage(messageId);
-
+        log.info("메시지 조회 성공: 메시지 id = {}", messageId);
         return messageMapper.toDto(message);
     }
 
@@ -113,11 +116,12 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    @Transactional
     public MessageDto update(UUID messageId, MessageUpdateRequest dto) {
         Message message = getMessage(messageId);
         message.updateMessage(dto.getNewContent());
-        messageRepository.save(message);
 
+        log.info("메시지 수정 성공: 메시지 id = {}", messageId);
         return messageMapper.toDto(message);
     }
 
@@ -129,6 +133,7 @@ public class BasicMessageService implements MessageService {
         //데이터에서 메시지 삭제 -> 조인 테이블과의 영속성 전이로 인해 관련된 조인 테이블의 데이터도 삭제 -> binaryContent와 조인테이블
         // 과의 연결도 끊김 -> JPA는 조인 테이블과의 연결이 끊긴 데이터를 orphan으로 인식하고 삭제해버림(orphanRemoval)
         messageRepository.delete(message);
+        log.info("메시지 삭제 성공: 메시지 id = {}", messageId);
     }
 
     // 유효성 검사
