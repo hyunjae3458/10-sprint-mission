@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.DuplicateEmailFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
@@ -31,16 +33,12 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserDto create(UserCreateRequest request, MultipartFile profile) {
-        // 유저 객체 생성
-        log.info("유저 회원가입 요청: 유저 이름 = {}, 이메일 = {}", request.getUsername(), request.getEmail());
-
         // 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
-            log.warn("회원가입 실패 - 이미 사용 중인 이메일: {}", request.getEmail());
-            // 예외처리 고도화 필요
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicateEmailFoundException(request.getEmail());
         }
 
+        // 유저 객체 생성
         User user = new User(request.getUsername(),
                 request.getEmail(),
                 request.getPassword());
@@ -57,11 +55,11 @@ public class BasicUserService implements UserService {
                 // 연관성 주입
                 binaryContentRepository.save(binaryContent);
                 binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
-                log.info("파일 업로드 성공! email = {}, 파일 id = {}, 파일 이름 = {}",
+                log.info("파일 업로드 성공: 유저 email = {}, 파일 id = {}, 파일 이름 = {}",
                         request.getEmail(), binaryContent.getId(), binaryContent.getFileName());
 
             } catch (Exception e) {
-                log.error("파일 업로드 실패: email = {}, 파일 이름 = {}",request.getEmail(), profile.getOriginalFilename(),e);
+                log.error("파일 업로드 실패: 유저 email = {}, 파일 이름 = {}",request.getEmail(), profile.getOriginalFilename(),e);
                 throw new RuntimeException("파일 업로드 오류가 발생했습니다",e);
             }
         }
@@ -120,8 +118,7 @@ public class BasicUserService implements UserService {
         // 이메일 수정
         if(request.getNewEmail() != null){
             if(userRepository.existsByEmail(request.getNewEmail())){
-                log.warn("회원가입 실패 - 이미 사용 중인 이메일: {}", request.getNewEmail());
-                throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+                throw new DuplicateEmailFoundException(request.getNewEmail());
             }
             user.updateEmail(request.getNewEmail());
         }
@@ -139,7 +136,7 @@ public class BasicUserService implements UserService {
                         profile.getContentType());
                 binaryContentRepository.save(newBinaryContent);
                 binaryContentStorage.put(newBinaryContent.getId(), profile.getBytes());
-                log.info("프로필 수정 성공: 유저 id = {}, 파일 id = {}, 파일 이름 = {}"
+                log.info("유저 프로필 수정 성공: 유저 id = {}, 파일 id = {}, 파일 이름 = {}"
                         , userId, newBinaryContent.getId(), newBinaryContent.getFileName());
 
                 user.updateProfileImg(newBinaryContent);
@@ -160,11 +157,12 @@ public class BasicUserService implements UserService {
 
         // 유저를 데이터에서 삭제
         userRepository.delete(user);
-        log.info("유저 삭제 성공: 유저 id = {}", userId);
+
         // 유저가 들고 있던 바이너리 컨텐츠 삭제
         if( profileImg != null){
             binaryContentRepository.delete(profileImg);
         }
+        log.info("유저 삭제 성공: 유저 id = {}", userId);
     }
 
     private boolean isOnline(Instant lastOnlineAt){
@@ -175,6 +173,6 @@ public class BasicUserService implements UserService {
     // 유효성 검사
     private User getUser(UUID userId){
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 }
