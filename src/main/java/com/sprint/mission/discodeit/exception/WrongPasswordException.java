@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.exception;
 
 import lombok.Getter;
 
+import java.util.Map;
+
 @Getter
-public class WrongPasswordException extends RuntimeException{
-    public final ErrorCode errorCode;
-    public WrongPasswordException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode =errorCode;
+public class WrongPasswordException extends DiscodeitException{
+    public WrongPasswordException() {
+        super(ErrorCode.WRONG_PASSWORD, Map.of());
     }
 }

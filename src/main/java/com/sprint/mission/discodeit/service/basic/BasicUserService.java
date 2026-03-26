@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.DuplicateEmailFoundException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
@@ -36,7 +36,7 @@ public class BasicUserService implements UserService {
     public UserDto create(UserCreateRequest request, MultipartFile profile) {
         // 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateEmailFoundException(request.getEmail(), ErrorCode.DUPLICATE_EMAIL);
+            throw new DuplicateEmailFoundException(request.getEmail());
         }
 
         // 유저 객체 생성
@@ -118,7 +118,7 @@ public class BasicUserService implements UserService {
         // 이메일 수정
         if(request.getNewEmail() != null){
             if(userRepository.existsByEmail(request.getNewEmail())){
-                throw new DuplicateEmailFoundException(request.getNewEmail(),ErrorCode.DUPLICATE_EMAIL);
+                throw new DuplicateEmailFoundException(request.getNewEmail());
             }
             user.updateEmail(request.getNewEmail());
         }
@@ -173,6 +173,6 @@ public class BasicUserService implements UserService {
     // 유효성 검사
     private User getUser(UUID userId){
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId, ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

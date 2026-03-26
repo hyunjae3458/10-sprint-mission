@@ -8,9 +8,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -49,9 +49,9 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments) {
         User user = userRepository.findById(request.getAuthorId())
-                .orElseThrow(() -> new UserNotFoundException(request.getAuthorId(), ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(request.getAuthorId()));
         Channel channel = channelRepository.findById(request.getChannelId())
-                .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId(),ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(request.getChannelId()));
         // 메시지 객체 생성
         Message message = new Message(user,request.getContent(),channel);
         if(attachments == null){
