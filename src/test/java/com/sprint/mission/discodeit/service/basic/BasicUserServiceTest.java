@@ -65,9 +65,13 @@ class BasicUserServiceTest {
         UserDto expectDto = new UserDto(user.getId(), username, email, null, true);
 
         // 동작 실행시 기대값이 나오도록 함
+        // 이메일 중복 확인시 false 반환
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        // 유저 레포지토리 저장시 유저 반환
         when(userRepository.save(any(User.class))).thenReturn(user);
+        // 유저 상태 레포지토리 저장시 유저 상태 반환
         when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
+        // 유저 매퍼 사용시 결과 dto 반환
         when(userMapper.toDto(any(User.class),eq(true))).thenReturn(expectDto);
         // when
         UserDto resultDto = userService.create(request,null);
@@ -119,11 +123,17 @@ class BasicUserServiceTest {
         UserDto expectDto = new UserDto(user.getId(), username, email, bcDto, true);
 
         // 동작 실행시 기대값이 나오도록 함
+        // 이메일 중복 확인 시 false
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        // 바이너리 레포지토리 저장시 bc반환
         when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(bc);
+        // 바이너리 저장소 저장시 해당 id 반환
         when(binaryContentStorage.put(bc.getId(),mockByte)).thenReturn(bc.getId());
+        // 유저 레포지토리 저장시 유저 반환
         when(userRepository.save(any(User.class))).thenReturn(user);
+        // 유저 상태 레포지토리 저장시 유저 상태 반환
         when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
+        // 유저 매퍼 사용시 결과 dto 반환
         when(userMapper.toDto(any(User.class),eq(true))).thenReturn(expectDto);
 
         // when
@@ -155,13 +165,16 @@ class BasicUserServiceTest {
         request.setPassword(password);
 
         // 동작 실행시 기대값이 나오도록 함
+        // 이메일 중복 확인시 true반환
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
         // when
         // then
         assertThrows(DuplicateEmailFoundException.class,
         () -> userService.create(request, null));
+        // 해당 메서드들은 실행된 횟수가 0인지 확인
         verify(userRepository, never()).save(any(User.class));
         verify(userStatusRepository, never()).save(any(UserStatus.class));
+        verify(userMapper, never()).toDto(any(User.class),eq(true));
     }
 
     @Test
@@ -195,13 +208,20 @@ class BasicUserServiceTest {
                 multipartFile.getContentType());
 
         // 동작 실행시 기대값이 나오도록 함
+        // 이메일 중복 확인 시 false
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        // 바이너리 레포지토리 저장시 bc반환
         when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(bc);
+        // 바이너리 저장소에 바이트 저장시 예외 반환
         when(binaryContentStorage.put(bc.getId(),mockByte))
                 .thenThrow(new FileUploadFailException());
         // when
         // then
         assertThrows(FileUploadFailException.class,
                 () -> userService.create(request, multipartFile));
+        // 해당 메서드들은 실행된 횟수가 0인지 확인
+        verify(userRepository, never()).save(any(User.class));
+        verify(userStatusRepository, never()).save(any(UserStatus.class));
+        verify(userMapper, never()).toDto(any(User.class),eq(true));
     }
 }
