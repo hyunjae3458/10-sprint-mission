@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class ChannelController {
     // 공용 채널 생성
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/public",method = RequestMethod.POST)
-    public ResponseEntity<ChannelDto> postPublicChannel(@RequestBody PublicChannelCreateRequest request){
+    public ResponseEntity<ChannelDto> postPublicChannel(@Valid @RequestBody PublicChannelCreateRequest request){
         log.debug("공용 채널 생성 요청: 채널 이름 = {}, 채널 설명 = {}", request.getName(), request.getDescription());
         ChannelDto response = channelService.createPublic(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -31,7 +32,7 @@ public class ChannelController {
     // 사설 채널 생성
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/private",method = RequestMethod.POST)
-    public ResponseEntity<ChannelDto> postPrivateChannel(@RequestBody PrivateChannelCreateRequest request){
+    public ResponseEntity<ChannelDto> postPrivateChannel(@Valid @RequestBody PrivateChannelCreateRequest request){
         log.debug("개인 채널 생성 요청: 참여자 수 = {}", request.getParticipantIds().size());
         ChannelDto response = channelService.createPrivate(request);
 
@@ -47,7 +48,7 @@ public class ChannelController {
     // 채널 업데이트
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     public ResponseEntity<ChannelDto> updateChannel(@PathVariable("channelId") UUID id,
-                                                      @RequestBody PublicChannelUpdateRequest dto){
+                                                     @Valid @RequestBody PublicChannelUpdateRequest dto){
         log.debug("채널 수정 요청: 수정할 채널 id = {}", id);
         ChannelDto response = channelService.update(id,dto);
         return ResponseEntity.ok(response);

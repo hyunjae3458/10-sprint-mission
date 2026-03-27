@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,20 +36,13 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> postUser(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-                                            @RequestPart("userCreateRequest") UserCreateRequest request,
+                                            @Valid @RequestPart("userCreateRequest") UserCreateRequest request,
                                             @RequestPart(value = "profile", required = false)MultipartFile profile){
         log.debug("유저 회원가입 요청: 유저 이름 = {}, 유저 이메일 = {}, 프로필 여부 = {}",
                 request.getUsername(), request.getEmail(), profile != null);
         UserDto response = userService.create(request , profile);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    // 유저 단건 조회
-//    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-//    public ResponseEntity<UserDto> getUser(@PathVariable("userId") UUID id){
-//        UserDto response = userService.findUser(id);
-//        return ResponseEntity.ok(response);
-//    }
 
     // 유저 전체 조회
     @RequestMapping(method = RequestMethod.GET)
@@ -61,7 +55,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateUser(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
                                               @PathVariable("userId") UUID id,
-                                              @RequestPart("userUpdateRequest") UserUpdateRequest request,
+                                              @Valid @RequestPart("userUpdateRequest") UserUpdateRequest request,
                                               @RequestPart(value="profile", required = false) MultipartFile profile){
         log.debug("유저 정보 수정 요청: 수정할 유저 id = {}, 프로필 수정 여부 = {}",id, profile != null);
         UserDto response = userService.update(id,request, profile);

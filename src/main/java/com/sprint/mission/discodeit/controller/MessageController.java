@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,7 @@ public class MessageController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> postMessage(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-                                                  @RequestPart("messageCreateRequest") MessageCreateRequest request,
+                                                  @Valid @RequestPart("messageCreateRequest") MessageCreateRequest request,
                                                   @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments){
         log.debug("메시지 생성 요청: authorId={}, channelId={}, attachmentCount={}",
                 request.getAuthorId(),
@@ -57,7 +58,7 @@ public class MessageController {
     // 메시지 업데이트
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID id,
-                                                    @RequestBody MessageUpdateRequest dto){
+                                                    @Valid @RequestBody MessageUpdateRequest dto){
         log.debug("메시지 수정 요청: 메시지 id = {}", id);
         MessageDto response = messageService.update(id,dto);
         return ResponseEntity.ok(response);
