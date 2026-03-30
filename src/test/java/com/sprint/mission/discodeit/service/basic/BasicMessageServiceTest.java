@@ -22,23 +22,22 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.swing.text.html.Option;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BasicMessageServiceTest {
@@ -87,24 +86,24 @@ class BasicMessageServiceTest {
         UUID binaryContentId = UUID.randomUUID();
         ReflectionTestUtils.setField(binaryContent, "id", binaryContentId);
 
-        when(userRepository.findById(authorId)).thenReturn(Optional.of(user));
-        when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
+        given(userRepository.findById(authorId)).willReturn(Optional.of(user));
+        given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
 
-        when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(binaryContent);
-        when(binaryContentStorage.put(binaryContentId,mockByte)).thenReturn(binaryContentId);
-        when(messageRepository.save(any(Message.class))).thenReturn(new Message(user, content, channel));
-        when(messageMapper.toDto(any(Message.class))).thenReturn(expectDto);
+        given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(binaryContent);
+        given(binaryContentStorage.put(binaryContentId,mockByte)).willReturn(binaryContentId);
+        given(messageRepository.save(any(Message.class))).willReturn(new Message(user, content, channel));
+        given(messageMapper.toDto(any(Message.class))).willReturn(expectDto);
 
         // when
         MessageDto resultDto = messageService.create(request, multipartFiles);
 
         // then
-        assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(content, resultDto.getContent());
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getContent()).isEqualTo(content);
 
-        verify(binaryContentRepository, times(1)).save(any(BinaryContent.class));
-        verify(binaryContentStorage, times(1)).put(any(), any());
-        verify(messageRepository, times(1)).save(any(Message.class));
+        then(binaryContentRepository).should(times(1)).save(any(BinaryContent.class));
+        then(binaryContentStorage).should(times(1)).put(any(), any());
+        then(messageRepository).should(times(1)).save(any(Message.class));
     }
 
     @Test
@@ -119,13 +118,14 @@ class BasicMessageServiceTest {
         when(userRepository.findById(request.getAuthorId())).thenReturn(Optional.empty());
         // when
         // then
-        assertThrows(UserNotFoundException.class,
-                () -> messageService.create(request,new ArrayList<>()));
+        assertThatThrownBy(() -> messageService.create(request,new ArrayList<>()))
+                .isInstanceOf(UserNotFoundException.class);
         verify(channelRepository, never()).findById(any(UUID.class));
-        verify(binaryContentRepository, never()).save(any(BinaryContent.class));
-        verify(binaryContentStorage, never()).put(any(),any());
-        verify(messageRepository, never()).save(any(Message.class));
-        verify(messageMapper, never()).toDto(any(Message.class));
+        then(channelRepository).should(never()).findById(any(UUID.class));
+        then(binaryContentRepository).should(never()).save(any(BinaryContent.class));
+        then(binaryContentStorage).should(never()).put(any(),any());
+        then(messageRepository).should(never()).save(any(Message.class));
+        then(messageMapper).should(never()).toDto(any(Message.class));
     }
 
     @Test
@@ -138,16 +138,16 @@ class BasicMessageServiceTest {
         request.setAuthorId(authorId);
         request.setChannelId(channelId);
 
-        when(userRepository.findById(request.getAuthorId())).thenReturn(Optional.of(new User()));
-        when(channelRepository.findById(request.getChannelId())).thenReturn(Optional.empty());
+        given(userRepository.findById(request.getAuthorId())).willReturn(Optional.of(new User()));
+        given(channelRepository.findById(request.getChannelId())).willReturn(Optional.empty());
         // when
         // then
-        assertThrows(ChannelNotFoundException.class,
-                () -> messageService.create(request,new ArrayList<>()));
-        verify(binaryContentRepository, never()).save(any(BinaryContent.class));
-        verify(binaryContentStorage, never()).put(any(),any());
-        verify(messageRepository, never()).save(any(Message.class));
-        verify(messageMapper, never()).toDto(any(Message.class));
+        assertThatThrownBy(() -> messageService.create(request,new ArrayList<>()))
+                .isInstanceOf(ChannelNotFoundException.class);
+        then(binaryContentRepository).should(never()).save(any(BinaryContent.class));
+        then(binaryContentStorage).should(never()).put(any(),any());
+        then(messageRepository).should(never()).save(any(Message.class));
+        then(messageMapper).should(never()).toDto(any(Message.class));
     }
 
     @Test
@@ -176,18 +176,19 @@ class BasicMessageServiceTest {
         UUID binaryContentId = UUID.randomUUID();
         ReflectionTestUtils.setField(binaryContent, "id", binaryContentId);
 
-        when(userRepository.findById(authorId)).thenReturn(Optional.of(user));
-        when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
-        when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(binaryContent);
-        when(binaryContentStorage.put(binaryContentId,mockByte)).thenThrow(new FileUploadFailException());
+        given(userRepository.findById(authorId)).willReturn(Optional.of(user));
+        given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
+        given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(binaryContent);
+        given(binaryContentStorage.put(binaryContentId,mockByte)).willThrow(new FileUploadFailException());
 
         // when
         // then
-        assertThrows(FileUploadFailException.class,
-                () -> messageService.create(request, multipartFiles));
+        assertThatThrownBy(() -> messageService.create(request, multipartFiles))
+                .isInstanceOf(FileUploadFailException.class);
 
         verify(messageRepository, never()).save(any(Message.class));
-        verify(messageMapper, never()).toDto(any(Message.class));
+        then(messageRepository).should(never()).save(any(Message.class));
+        then(messageMapper).should(never()).toDto(any(Message.class));
     }
 
     // update
@@ -215,12 +216,12 @@ class BasicMessageServiceTest {
                 request.getNewContent()
         );
 
-        when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(expectDto);
+        given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
+        given(messageMapper.toDto(message)).willReturn(expectDto);
         // when
         MessageDto resultDto = messageService.update(messageId,request);
         // then
-        assertEquals(expectDto.getContent(),resultDto.getContent());
+        assertThat(resultDto.getContent()).isEqualTo(expectDto.getContent());
     }
 
     @Test
@@ -232,12 +233,12 @@ class BasicMessageServiceTest {
         String content = "안녕!";
         MessageUpdateRequest request = new MessageUpdateRequest(content);
 
-        when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
+        given(messageRepository.findById(messageId)).willReturn(Optional.empty());
         // when
         // then
-        assertThrows(MessageNotFoundException.class,
-                () -> messageService.update(messageId, request));
-        verify(messageMapper, never()).toDto(any(Message.class));
+        assertThatThrownBy(() -> messageService.update(messageId, request))
+                .isInstanceOf(MessageNotFoundException.class);
+        then(messageMapper).should(never()).toDto(any(Message.class));
     }
 
     // delete
@@ -248,11 +249,11 @@ class BasicMessageServiceTest {
         UUID messageId = UUID.randomUUID();
         Message message = new Message();
 
-        when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
+        given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
         // when
         messageService.delete(messageId);
         // then
-        verify(messageRepository, times(1)).delete(any(Message.class));
+        then(messageRepository).should(times(1)).delete(any(Message.class));
     }
 
     @Test
@@ -261,11 +262,11 @@ class BasicMessageServiceTest {
         // given
         UUID messageId = UUID.randomUUID();
 
-        when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
+        given(messageRepository.findById(messageId)).willReturn(Optional.empty());
         // when
         // then
-        assertThrows(MessageNotFoundException.class,
-                () -> messageService.delete(messageId));
-        verify(messageRepository, never()).delete(any(Message.class));
+        assertThatThrownBy(() -> messageService.delete(messageId))
+                .isInstanceOf(MessageNotFoundException.class);
+        then(messageRepository).should(never()).delete(any(Message.class));
     }
 }

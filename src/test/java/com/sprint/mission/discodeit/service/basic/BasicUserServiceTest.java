@@ -23,15 +23,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BasicUserServiceTest {
@@ -70,23 +69,23 @@ class BasicUserServiceTest {
 
         // 동작 실행시 기대값이 나오도록 함
         // 이메일 중복 확인시 false 반환
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        given(userRepository.existsByEmail(anyString())).willReturn(false);
         // 유저 레포지토리 저장시 유저 반환
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        given(userRepository.save(any(User.class))).willReturn(user);
         // 유저 상태 레포지토리 저장시 유저 상태 반환
-        when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
+        given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
         // 유저 매퍼 사용시 결과 dto 반환
-        when(userMapper.toDto(any(User.class),eq(true))).thenReturn(expectDto);
+        given(userMapper.toDto(any(User.class),eq(true))).willReturn(expectDto);
         // when
         UserDto resultDto = userService.create(request,null);
         // then
         // dto가 널이 아닌지, 필드값이 일치한지 테스트
-        assertNotNull(resultDto);
-        assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(expectDto.getUsername(), resultDto.getUsername());
-        assertEquals(expectDto.getEmail(), resultDto.getEmail());
-        assertEquals(expectDto.getProfile(), resultDto.getProfile());
-        assertTrue(resultDto.isOnline());
+        assertThat(resultDto).isNotNull();
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getUsername()).isEqualTo(expectDto.getUsername());
+        assertThat(resultDto.getEmail()).isEqualTo(expectDto.getEmail());
+        assertThat(resultDto.getProfile()).isEqualTo(expectDto.getProfile());;
+        assertThat(resultDto.isOnline()).isTrue();
     }
 
     @Test
@@ -129,31 +128,31 @@ class BasicUserServiceTest {
 
         // 동작 실행시 기대값이 나오도록 함
         // 이메일 중복 확인 시 false
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        given(userRepository.existsByEmail(anyString())).willReturn(false);
         // 바이너리 레포지토리 저장시 bc반환
-        when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(bc);
+        given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(bc);
         // 바이너리 저장소 저장시 해당 id 반환
-        when(binaryContentStorage.put(eq(fakeId),eq(mockByte))).thenReturn(bc.getId());
+        given(binaryContentStorage.put(eq(fakeId),eq(mockByte))).willReturn(bc.getId());
         // 유저 레포지토리 저장시 유저 반환
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        given(userRepository.save(any(User.class))).willReturn(user);
         // 유저 상태 레포지토리 저장시 유저 상태 반환
-        when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
+        given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
         // 유저 매퍼 사용시 결과 dto 반환
-        when(userMapper.toDto(any(User.class),eq(true))).thenReturn(expectDto);
+        given(userMapper.toDto(any(User.class),eq(true))).willReturn(expectDto);
 
         // when
         UserDto resultDto = userService.create(request, multipartFile);
         // then
-        assertNotNull(resultDto);
-        assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(expectDto.getUsername(), resultDto.getUsername());
-        assertEquals(expectDto.getEmail(), resultDto.getEmail());
-        assertEquals(expectDto.getProfile(), resultDto.getProfile());
-        assertTrue(resultDto.isOnline());
-        assertEquals(expectDto.getProfile().getId(), resultDto.getProfile().getId());
-        assertEquals(expectDto.getProfile().getSize(), resultDto.getProfile().getSize());
-        assertEquals(expectDto.getProfile().getFileName(), resultDto.getProfile().getFileName());
-        assertEquals(expectDto.getProfile().getContentType(), resultDto.getProfile().getContentType());
+        assertThat(resultDto).isNotNull();
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getUsername()).isEqualTo(expectDto.getUsername());
+        assertThat(resultDto.getEmail()).isEqualTo(expectDto.getEmail());
+        assertThat(resultDto.getProfile()).isEqualTo(expectDto.getProfile());
+        assertThat(resultDto.isOnline()).isTrue();
+        assertThat(resultDto.getProfile().getId()).isEqualTo(expectDto.getProfile().getId());
+        assertThat(resultDto.getProfile().getSize()).isEqualTo(expectDto.getProfile().getSize());
+        assertThat(resultDto.getProfile().getFileName()).isEqualTo(expectDto.getProfile().getFileName());
+        assertThat(resultDto.getProfile().getContentType()).isEqualTo(expectDto.getProfile().getContentType());
     }
 
     @Test
@@ -171,15 +170,15 @@ class BasicUserServiceTest {
 
         // 동작 실행시 기대값이 나오도록 함
         // 이메일 중복 확인시 true반환
-        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+        given(userRepository.existsByEmail(anyString())).willReturn(true);
         // when
         // then
-        assertThrows(DuplicateEmailFoundException.class,
-        () -> userService.create(request, null));
+        assertThatThrownBy(() -> userService.create(request, null))
+                .isInstanceOf(DuplicateEmailFoundException.class);
         // 해당 메서드들은 실행된 횟수가 0인지 확인
-        verify(userRepository, never()).save(any(User.class));
-        verify(userStatusRepository, never()).save(any(UserStatus.class));
-        verify(userMapper, never()).toDto(any(User.class),eq(true));
+        then(userRepository).should(never()).save(any(User.class));
+        then(userStatusRepository).should(never()).save(any(UserStatus.class));
+        then(userMapper).should(never()).toDto(any(User.class),eq(true));
     }
 
     @Test
@@ -214,20 +213,20 @@ class BasicUserServiceTest {
 
         // 동작 실행시 기대값이 나오도록 함
         // 이메일 중복 확인 시 false
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        given(userRepository.existsByEmail(anyString())).willReturn(false);
         // 바이너리 레포지토리 저장시 bc반환
-        when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(bc);
+        given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(bc);
         // 바이너리 저장소에 바이트 저장시 예외 반환
-        when(binaryContentStorage.put(bc.getId(),mockByte))
-                .thenThrow(new FileUploadFailException());
+        given(binaryContentStorage.put(bc.getId(),mockByte))
+                .willThrow(new FileUploadFailException());
         // when
         // then
-        assertThrows(FileUploadFailException.class,
-                () -> userService.create(request, multipartFile));
+        assertThatThrownBy(() -> userService.create(request, multipartFile))
+                .isInstanceOf(FileUploadFailException.class);
         // 해당 메서드들은 실행된 횟수가 0인지 확인
-        verify(userRepository, never()).save(any(User.class));
-        verify(userStatusRepository, never()).save(any(UserStatus.class));
-        verify(userMapper, never()).toDto(any(User.class),eq(true));
+        then(userRepository).should(never()).save(any(User.class));
+        then(userStatusRepository).should(never()).save(any(UserStatus.class));
+        then(userMapper).should(never()).toDto(any(User.class),eq(true));
     }
 
     // update
@@ -246,12 +245,12 @@ class BasicUserServiceTest {
 
         // 동작 실행시 기대값이 나오도록 함
         // 수정할 유저 조회 시 usernotfound 예외 발생
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
 
         // when
         // then
-        assertThrows(UserNotFoundException.class,
-                () -> userService.update(userId,request,null));
+        assertThatThrownBy(() -> userService.update(userId,request,null))
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
@@ -277,19 +276,19 @@ class BasicUserServiceTest {
         UserStatus userStatus = new UserStatus(user);
 
         // 동작 실행시 기대값이 나오도록 함
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        given(userRepository.existsByEmail(anyString())).willReturn(false);
         // 수정할 유저 조회 시 조회 성공
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userStatusRepository.findByUserId(userId)).thenReturn(Optional.of(userStatus));
-        when(userMapper.toDto(any(User.class), eq(true))).thenReturn(expectDto);
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(userStatusRepository.findByUserId(userId)).willReturn(Optional.of(userStatus));
+        given(userMapper.toDto(any(User.class), eq(true))).willReturn(expectDto);
 
         // when
         UserDto resultDto = userService.update(userId, request, null);
         // then
-        assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(expectDto.getUsername(), resultDto.getUsername());
-        assertEquals(expectDto.getEmail(), resultDto.getEmail());
-        assertTrue(resultDto.isOnline());
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getUsername()).isEqualTo(expectDto.getUsername());
+        assertThat(resultDto.getEmail()).isEqualTo(expectDto.getEmail());
+        assertThat(resultDto.isOnline()).isTrue();
     }
 
     @Test
@@ -335,23 +334,23 @@ class BasicUserServiceTest {
         // 기대 유저 상태
         UserStatus userStatus = new UserStatus(user);
         // 동작 실행시 기대값이 나오도록 함
-        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(binaryContent);
-        when(binaryContentStorage.put(eq(bcId), eq(mockByte))).thenReturn(bcId);
-        when(userStatusRepository.findByUserId(userId)).thenReturn(Optional.of(userStatus));
-        when(userMapper.toDto(any(User.class), eq(true))).thenReturn(expectDto);
+        given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(user));
+        given(userRepository.existsByEmail(anyString())).willReturn(false);
+        given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(binaryContent);
+        given(binaryContentStorage.put(eq(bcId), eq(mockByte))).willReturn(bcId);
+        given(userStatusRepository.findByUserId(userId)).willReturn(Optional.of(userStatus));
+        given(userMapper.toDto(any(User.class), eq(true))).willReturn(expectDto);
 
         // when
         UserDto resultDto = userService.update(userId,request,multipartFile);
         // then
-        assertEquals(expectDto.getUsername(), resultDto.getUsername());
-        assertEquals(expectDto.getEmail(), resultDto.getEmail());
-        assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(expectDto.getProfile().getId(), resultDto.getProfile().getId());
-        assertEquals(expectDto.getProfile().getContentType(), resultDto.getProfile().getContentType());
-        assertEquals(expectDto.getProfile().getSize(), resultDto.getProfile().getSize());
-        assertEquals(expectDto.getProfile().getFileName(), resultDto.getProfile().getFileName());
+        assertThat(resultDto.getUsername()).isEqualTo(expectDto.getUsername());
+        assertThat(resultDto.getEmail()).isEqualTo(expectDto.getEmail());
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getProfile().getId()).isEqualTo(expectDto.getProfile().getId());
+        assertThat(resultDto.getProfile().getContentType()).isEqualTo(expectDto.getProfile().getContentType());
+        assertThat(resultDto.getProfile().getSize()).isEqualTo(expectDto.getProfile().getSize());
+        assertThat(resultDto.getProfile().getFileName()).isEqualTo(expectDto.getProfile().getFileName());
     }
 
     @Test
@@ -374,13 +373,13 @@ class BasicUserServiceTest {
 
         // 동작 실행시 기대값이 나오도록 함
         // 수정할 유저 조회 시 usernotfound 예외 발생
-        when(userRepository.findById(fakeId)).thenReturn(Optional.of(user));
-        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+        given(userRepository.findById(fakeId)).willReturn(Optional.of(user));
+        given(userRepository.existsByEmail(anyString())).willReturn(true);
 
         // when
         // then
-        assertThrows(DuplicateEmailFoundException.class,
-                () -> userService.update(fakeId,request,null));
+        assertThatThrownBy(() -> userService.update(fakeId,request,null))
+                .isInstanceOf(DuplicateEmailFoundException.class);
     }
 
     @Test
@@ -414,17 +413,17 @@ class BasicUserServiceTest {
         ReflectionTestUtils.setField(binaryContent,"id", bcId);
 
         // 동작 실행시 기대값이 나오도록 함
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(binaryContent);
-        when(binaryContentStorage.put(eq(bcId), eq(mockByte))).thenThrow(new FileUploadFailException());
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(userRepository.existsByEmail(anyString())).willReturn(false);
+        given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(binaryContent);
+        given(binaryContentStorage.put(eq(bcId), eq(mockByte))).willThrow(new FileUploadFailException());
 
         // when
         // then
-        assertThrows(FileUploadFailException.class,
-                () -> userService.update(userId,request,multipartFile));
-        verify(userStatusRepository, never()).save(any(UserStatus.class));
-        verify(userMapper, never()).toDto(any(User.class),eq(true));
+        assertThatThrownBy(() -> userService.update(userId,request,multipartFile))
+                .isInstanceOf(FileUploadFailException.class);
+        then(userStatusRepository).should(never()).save(any(UserStatus.class));
+        then(userMapper).should(never()).toDto(any(User.class),eq(true));
     }
 
     // 삭제
@@ -436,12 +435,12 @@ class BasicUserServiceTest {
         User user = new User("김현재", "fred@naver.com", "123123");
         BinaryContent profileImg = user.getProfile();
 
-        when(userRepository.findById(fakeId)).thenReturn(Optional.of(user));
+        given(userRepository.findById(fakeId)).willReturn(Optional.of(user));
         // when
         userService.delete(fakeId);
         // then
-        verify(userRepository, times(1)).delete(any(User.class));
-        verify(binaryContentRepository, never()).delete(any(BinaryContent.class));
+        then(userRepository).should(times(1)).delete(any(User.class));
+        then(binaryContentRepository).should(never()).delete(any(BinaryContent.class));
     }
 
     @Test
@@ -457,11 +456,11 @@ class BasicUserServiceTest {
         );
         ReflectionTestUtils.setField(user,"profile",profileImg);
 
-        when(userRepository.findById(fakeId)).thenReturn(Optional.of(user));
+        given(userRepository.findById(fakeId)).willReturn(Optional.of(user));
         // when
         userService.delete(fakeId);
         // then
-        verify(userRepository, times(1)).delete(any(User.class));
-        verify(binaryContentRepository, times(1)).delete(profileImg);
+        then(userRepository).should(times(1)).delete(any(User.class));
+        then(binaryContentRepository).should(times(1)).delete(profileImg);
     }
 }

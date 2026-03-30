@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +34,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BasicChannelServiceTest {
@@ -77,16 +80,18 @@ class BasicChannelServiceTest {
                 channelType
         );
 
-        when(channelRepository.save(any(Channel.class))).thenReturn(channel);
-        when(channelMapper.toDto(any(Channel.class))).thenReturn(expectDto);
+        given(channelRepository.save(any(Channel.class))).willReturn(channel);
+        given(channelMapper.toDto(any(Channel.class))).willReturn(expectDto);
         // when
         ChannelDto resultDto = channelService.createPublic(request);
         // then
         assertEquals(expectDto.getId(), resultDto.getId());
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
         assertEquals(expectDto.getDescription(), resultDto.getDescription());
-        assertEquals(expectDto.getType(), resultDto.getType());
-        assertEquals(expectDto.getName(), resultDto.getName());
-        assertEquals(expectDto.getLastMessageAt(), resultDto.getLastMessageAt());
+        assertThat(resultDto.getDescription()).isEqualTo(expectDto.getDescription());
+        assertThat(resultDto.getType()).isEqualTo(expectDto.getType());
+        assertThat(resultDto.getName()).isEqualTo(expectDto.getName());
+        assertThat(resultDto.getLastMessageAt()).isEqualTo(expectDto.getLastMessageAt());
     }
 
     @Test
@@ -121,17 +126,18 @@ class BasicChannelServiceTest {
                 channelType
         );
 
-        when(channelRepository.save(any(Channel.class))).thenReturn(channel);
-        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
-        when(readStatusRepository.save(any(ReadStatus.class))).thenReturn(readStatus);
-        when(channelMapper.toDto(any(Channel.class))).thenReturn(expectDto);
+        given(channelRepository.save(any(Channel.class))).willReturn(channel);
+        given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(user));
+        given(readStatusRepository.save(any(ReadStatus.class))).willReturn(readStatus);
+        given(channelMapper.toDto(any(Channel.class))).willReturn(expectDto);
         // when
         ChannelDto resultDto = channelService.createPrivate(request);
         // then
         assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(expectDto.getDescription(), resultDto.getDescription());
-        assertEquals(expectDto.getType(), resultDto.getType());
-        assertEquals(expectDto.getLastMessageAt(), resultDto.getLastMessageAt());
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getDescription()).isEqualTo(expectDto.getDescription());
+        assertThat(resultDto.getType()).isEqualTo(expectDto.getType());
+        assertThat(resultDto.getLastMessageAt()).isEqualTo(expectDto.getLastMessageAt());
     }
 
     @Test
@@ -146,14 +152,14 @@ class BasicChannelServiceTest {
         PrivateChannelCreateRequest request = new PrivateChannelCreateRequest();
         request.setParticipantIds(List.of(fakeId));
 
-        when(channelRepository.save(any(Channel.class))).thenReturn(channel);
-        when(userRepository.findById(fakeId)).thenReturn(Optional.empty());
+        given(channelRepository.save(any(Channel.class))).willReturn(channel);
+        given(userRepository.findById(fakeId)).willReturn(Optional.empty());
         // when
         // then
-        assertThrows(UserNotFoundException.class,
-                () -> channelService.createPrivate(request));
-        verify(readStatusRepository, never()).save(any(ReadStatus.class));
-        verify(channelMapper, never()).toDto(any(Channel.class));
+        assertThatThrownBy(() -> channelService.createPrivate(request))
+                .isInstanceOf(UserNotFoundException.class);
+        then(readStatusRepository).should(never()).save(any(ReadStatus.class));
+        then(channelMapper).should(never()).toDto(any(Channel.class));
     }
     // update
     @Test
@@ -182,15 +188,16 @@ class BasicChannelServiceTest {
                 Instant.now(),
                 channel.getType()
         );
-        when(channelRepository.findById(fakeId)).thenReturn(Optional.of(channel));
-        when(channelMapper.toDto(any(Channel.class))).thenReturn(expectDto);
+        given(channelRepository.findById(fakeId)).willReturn(Optional.of(channel));
+        given(channelMapper.toDto(any(Channel.class))).willReturn(expectDto);
         // when
         ChannelDto resultDto = channelService.update(fakeId, request);
         // then
         assertEquals(expectDto.getId(), resultDto.getId());
-        assertEquals(expectDto.getType(), resultDto.getType());
-        assertEquals(expectDto.getDescription(), resultDto.getDescription());
-        assertEquals(expectDto.getName(), resultDto.getName());
+        assertThat(resultDto.getId()).isEqualTo(expectDto.getId());
+        assertThat(resultDto.getType()).isEqualTo(expectDto.getType());
+        assertThat(resultDto.getDescription()).isEqualTo(expectDto.getDescription());
+        assertThat(resultDto.getName()).isEqualTo(expectDto.getName());
     }
 
     @Test
@@ -206,12 +213,12 @@ class BasicChannelServiceTest {
         ReflectionTestUtils.setField(channel, "id", channelId);
         PublicChannelUpdateRequest request = new PublicChannelUpdateRequest();
 
-        when(channelRepository.findById(channelId)).thenReturn(Optional.empty());
+        given(channelRepository.findById(channelId)).willReturn(Optional.empty());
         // when
         // then
-        assertThrows(ChannelNotFoundException.class,
-                () -> channelService.update(channelId, request));
-        verify(channelMapper, never()).toDto(channel);
+        assertThatThrownBy(() -> channelService.update(channelId, request))
+                .isInstanceOf(ChannelNotFoundException.class);
+        then(channelMapper).should(never()).toDto(channel);
     }
 
     @Test
@@ -225,12 +232,14 @@ class BasicChannelServiceTest {
         ReflectionTestUtils.setField(channel, "id", channelId);
         PublicChannelUpdateRequest request = new PublicChannelUpdateRequest();
 
-        when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
+        given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
         // when
         // then
         assertThrows(PrivateChannelUpdateException.class,
                 () -> channelService.update(channelId, request));
-        verify(channelMapper, never()).toDto(any(Channel.class));
+        assertThatThrownBy(() -> channelService.update(channelId, request))
+                .isInstanceOf(PrivateChannelUpdateException.class);
+        then(channelMapper).should(never()).toDto(any(Channel.class));
     }
 
     // delete
@@ -242,12 +251,12 @@ class BasicChannelServiceTest {
         Channel channel = new Channel();
         ReflectionTestUtils.setField(channel, "id", channelId);
 
-        when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
-        when(messageRepository.findAllByChannel(channel)).thenReturn(anyList());
+        given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
+        given(messageRepository.findAllByChannel(channel)).willReturn(anyList());
         // when
         channelService.delete(channelId);
         // then
-        verify(messageRepository, times(1)).deleteAll(anyList());
-        verify(channelRepository, times(1)).delete(channel);
+        then(messageRepository).should(times(1)).deleteAll(anyList());
+        then(channelRepository).should(times(1)).delete(channel);
     }
 }
