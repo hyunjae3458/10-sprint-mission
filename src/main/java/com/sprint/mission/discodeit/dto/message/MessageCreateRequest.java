@@ -6,11 +6,13 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
+@Setter
 public class MessageCreateRequest {
     @NotNull(message = "작성자 ID는 필수입니다.")
     private UUID authorId;

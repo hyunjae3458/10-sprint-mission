@@ -66,7 +66,7 @@ public class BasicMessageService implements MessageService {
                         bc.getSize(),
                         bc.getOriginalFilename(),
                         bc.getContentType());
-                binaryContentRepository.save(binaryContent);
+                binaryContent = binaryContentRepository.save(binaryContent);
                 binaryContentStorage.put(binaryContent.getId(), bc.getBytes());
             } catch (IOException e) {
                 throw new FileUploadFailException();
