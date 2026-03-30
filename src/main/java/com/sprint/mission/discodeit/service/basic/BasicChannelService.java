@@ -125,7 +125,12 @@ public class BasicChannelService implements ChannelService {
             throw new PrivateChannelUpdateException(channelId);
         }
         // 채널 업데이트
-        channel.updateChannel(dto.getNewName(),dto.getNewDescription());
+        if(dto.getNewName() != null){
+            channel.updateChannelName(dto.getNewName());
+        }
+        if(dto.getNewDescription() != null){
+            channel.updateChannelDescription(dto.getNewDescription());
+        }
 
         log.info("채널 수정 성공: 채널 id = {}", channelId);
         return channelMapper.toDto(channel);
