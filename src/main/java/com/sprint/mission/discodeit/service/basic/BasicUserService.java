@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
 
                 user.addProfileImage(binaryContent);
                 // 연관성 주입
-                binaryContentRepository.save(binaryContent);
+                binaryContent = binaryContentRepository.save(binaryContent);
                 binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
                 log.info("파일 업로드 성공: 유저 email = {}, 파일 id = {}, 파일 이름 = {}",
                         request.getEmail(), binaryContent.getId(), binaryContent.getFileName());
@@ -134,7 +134,7 @@ public class BasicUserService implements UserService {
                         profile.getSize(),
                         profile.getOriginalFilename(),
                         profile.getContentType());
-                binaryContentRepository.save(newBinaryContent);
+                newBinaryContent = binaryContentRepository.save(newBinaryContent);
                 binaryContentStorage.put(newBinaryContent.getId(), profile.getBytes());
 
                 user.updateProfileImg(newBinaryContent);
