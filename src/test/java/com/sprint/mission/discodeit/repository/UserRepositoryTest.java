@@ -38,11 +38,20 @@ class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("이메일로 유저를 검색하면 해당 이메일의 유저가 있는지 반환해야한다")
     void existsByEmail() {
         // given
+        String targetEmail1 = "fred@naver.com";
+        String targetEmail2 = "sonata@naver.com";
+        User user = new User("김현재",targetEmail1,"123123");
 
+        userRepository.save(user);
         // when
+        boolean result1 = userRepository.existsByEmail(targetEmail1);
+        boolean result2 = userRepository.existsByEmail(targetEmail2);
 
         // then
+        assertThat(result1).isTrue();
+        assertThat(result2).isFalse();
     }
 }
