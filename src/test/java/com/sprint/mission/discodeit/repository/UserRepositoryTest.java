@@ -21,7 +21,7 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("유저 이름으로 검색하면 해당 유저 이름의 객체를 반환해야 한다.")
-    void find_by_username_success() {
+    void findByUsername_success() {
         // given
         String targetName = "김현재";
         User user = new User(targetName, "fred@naver.com", "123123");
