@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.channel;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Setter
 public class PublicChannelCreateRequest {
     @NotNull(message = "공용 채널은 채널 이름이 필수입니다")

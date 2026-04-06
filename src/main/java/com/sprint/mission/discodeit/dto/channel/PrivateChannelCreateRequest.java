@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Setter
 public class PrivateChannelCreateRequest {
     @NotNull(message = "개인 채널은 참여자가 필수입니다")

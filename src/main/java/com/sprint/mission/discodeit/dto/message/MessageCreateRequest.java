@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @Setter
 public class MessageCreateRequest {
     @NotNull(message = "작성자 ID는 필수입니다.")
