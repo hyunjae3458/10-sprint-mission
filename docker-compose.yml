@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: discodeit-db
+    restart: always
+    environment:
+      POSTGRES_DB: discodeit
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d discodeit" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "5432:5432"
+    volumes:
+      # postgres 데이터 유지
+      - postgres_data:/var/lib/postgresql/data
+      # 로컬의 schema.sql 파일을 컨테이너 내부의 경로로 복사
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
+  # 2. 애플리케이션 서비스 설정
+  app:
+    # [요구사항] 로컬 Dockerfile에서 빌드
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-app
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discodeit
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "80:8080"
+    volumes:
+      - ./uploads:/app/uploads
+    # db가 먼저 떠야 app컨테이너가 띄어짐
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  postgres_data:
