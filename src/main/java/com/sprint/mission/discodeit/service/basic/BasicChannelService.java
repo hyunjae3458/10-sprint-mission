@@ -119,6 +119,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest dto) {
         Channel channel = getChannel(channelId);
         if(channel.getType() == ChannelType.PRIVATE){

@@ -15,7 +15,10 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e){
-        log.warn("예외 발생: 메시지 = {}",e.getErrorCode().getMessage(), e);
+        log.warn(" [Domain Error] Code: {}, Message: {}, Details: {}",
+                e.getErrorCode().getCode(),
+                e.getErrorCode().getMessage(),
+                e.getDetails());
         ErrorResponse response = new ErrorResponse(
                 e.getTimestamp(),
                 e.getErrorCode().getCode(),

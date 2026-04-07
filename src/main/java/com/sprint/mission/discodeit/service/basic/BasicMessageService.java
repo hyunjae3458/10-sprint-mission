@@ -92,6 +92,8 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         // slice는 페이자(offset)이 항상 0이어야함
         Pageable safePageable = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());

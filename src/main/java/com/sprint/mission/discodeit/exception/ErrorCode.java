@@ -11,6 +11,7 @@ public enum ErrorCode {
     FILE_UPLOAD_FAIL(400, "FILE_UPLOAD_FAIL", "파일 업로드가 실패했습니다."),
     FILE_SAVE_FAIL(400, "FILE_SAVE_FAIL", "파일 저장에 실패했습니다."),
     FILE_READ_FAIL(400, "FILE_READ_FAIL", "파일 읽기에 실패했습니다."),
+    STORAGE_INIT_FAIL(400, "STORAGE_INIT_FAIL", "저장소 초기화가 실패했습니다."),
     WRONG_PASSWORD( 401,"WRONG_PASSWORD","잘못된 비밀번호입니다."),
     USER_NOT_FOUND(404,"USER_NOT_FOUND","유저를 찾을 수 없습니다."),
     USERSTATUS_NOT_FOUND( 404,"USERSTATUS_NOT_FOUND","해당 유저의 상태를 찾을 수 없습니다."),
