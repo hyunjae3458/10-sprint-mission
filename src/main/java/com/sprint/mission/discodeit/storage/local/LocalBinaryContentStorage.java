@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.file.FileReadFailException;
 import com.sprint.mission.discodeit.exception.file.FileSaveFailException;
+import com.sprint.mission.discodeit.exception.others.StorageInitException;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -37,7 +38,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize storage root", e);
+            throw new StorageInitException(root,"Could not initialize storage root");
         }
     }
 
