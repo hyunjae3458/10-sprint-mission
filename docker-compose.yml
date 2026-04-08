@@ -15,8 +15,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+      # 임시로 5433로 설정
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       # postgres 데이터 유지
       - postgres_data:/var/lib/postgresql/data
@@ -32,10 +33,18 @@ services:
     container_name: discodeit-app
     restart: always
     environment:
+      # 스프링의 db연결 환경변수
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discodeit
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      # discodeit IAM 접근 키, 리전, 버킷이름
+      AWS_CREDENTIALS_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+      AWS_CREDENTIALS_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_BUCKET_NAME}
+
+
     ports:
       - "80:8080"
     volumes:

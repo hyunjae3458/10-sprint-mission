@@ -9,12 +9,12 @@ FROM ${BUILDER_IMAGE} AS builder
 USER root
 WORKDIR /app
 
-# 내 로컬의 gradlew실행파일을 컨테이너 현재 디렉토리(/app)에 복사한다, 이때 권한을 gradle유저에게 주면서
-COPY --chown=gradle:gradle gradlew ./
-# 내 로컬의 gradle파일을 컨테이너 /app/gradle에 복사한다, 이때 권한을 gradle유저에게 주면서
-COPY --chown=gradle:gradle gradle ./gradle
-# 내 로컬의 build.gradle과 setting.gradle을 컨테이너 현재 디렉토리(/app)에 복사한다, 이때 권한을 gradle유저에게 주면서
-COPY --chown=gradle:gradle build.gradle settings.gradle ./
+# 내 로컬의 gradlew실행파일을 컨테이너 현재 디렉토리(/app)에 복사한다
+COPY gradlew ./
+# 내 로컬의 gradle파일을 컨테이너 /app/gradle에 복사한다,
+COPY gradle ./gradle
+# 내 로컬의 build.gradle과 setting.gradle을 컨테이너 현재 디렉토리(/app)에 복사한다
+COPY build.gradle settings.gradle ./
 
 # gradlew 실행 권한 부여
 RUN chmod +x ./gradlew
@@ -22,7 +22,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew --no-daemon --refresh-dependencies dependencies || true
 
 # 로컬의 src를 컨테이너의 현재  디렉토리 안의 폴더 src에 복사
-COPY --chown=gradle:gradle src ./src
+COPY src ./src
 # 애플리케이션 빌드 (테스트 제외, 속도 향상)
 RUN ./gradlew clean build --no-daemon --no-parallel -x test
 
@@ -37,10 +37,10 @@ ENV PROJECT_NAME=discodeit
 ENV PROJECT_VERSION=1.2-M8
 ENV JVM_OPTS=""
 # 빌드 스테이지에서 생성한 JAR 파일만 복사
-COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar
 # 애플리케이션이 사용하는 포트 노출
 EXPOSE 80
 # Spring Boot 프로필을 운영(prod)으로 설정
 ENV SPRING_PROFILES_ACTIVE=prod
 # 컨테이너 시작 시 JAR 실행, sh -c 는 환경변수를 쉘환경에서 인식시키기 위해서 추가함
-ENTRYPOINT ["sh","-c","java $JVM_OPTS -jar app.jar"]
+ENTRYPOINT ["sh","-c","java $JVM_OPTS -jar $PROJECT_NAME-$PROJECT_VERSION.jar"]
