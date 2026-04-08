@@ -44,6 +44,10 @@ services:
       AWS_REGION: ${AWS_REGION}
       AWS_S3_BUCKET: ${AWS_BUCKET_NAME}
 
+      # 저장소 관련 환경 변수
+      STORAGE_TYPE: s3
+      STORAGE_LOCAL_ROOT_PATH: ./uploads
+      AWS_S3_PRESIGNED_URL_EXPIRATION: 600
 
     ports:
       - "80:8080"
