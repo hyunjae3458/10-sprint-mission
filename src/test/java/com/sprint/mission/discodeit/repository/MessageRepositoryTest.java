@@ -41,11 +41,11 @@ class MessageRepositoryTest {
         User user = userRepository.save(new User("김현재", "fred@naver.com","123123"));
 
         Message message1 = messageRepository.save(new Message(user, "안녕하세요!", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message message2 = messageRepository.save(new Message(user, "안녕!", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message message3 = messageRepository.save(new Message(user, "하세요!", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
 
         // when
         Optional<Message> latestMessage = messageRepository.findFirstByChannelIdOrderByCreatedAtDesc(channel.getId());
@@ -81,9 +81,9 @@ class MessageRepositoryTest {
 
         // given
         Message msg1 = messageRepository.save(new Message(user, "첫 번째 (가장 오래된)", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg2 = messageRepository.save(new Message(user, "두 번째 (커서 기준점)", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg3 = messageRepository.save(new Message(user, "세 번째 (가장 최신)", channel));
 
         Instant cursor = msg2.getCreatedAt();
@@ -112,11 +112,11 @@ class MessageRepositoryTest {
 
         // given
         Message msg1 = messageRepository.save(new Message(user, "첫 번째 (hasNext 존재)", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg2 = messageRepository.save(new Message(user, "두 번째", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg3 = messageRepository.save(new Message(user, "세 번째", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg4 = messageRepository.save(new Message(user, "네번째 번째 (커서 기준점))", channel));
 
         Instant cursor = msg4.getCreatedAt();
@@ -144,9 +144,9 @@ class MessageRepositoryTest {
 
         // given
         Message msg1 = messageRepository.save(new Message(user, "첫 번째 (가장 오래된)", channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg2 = messageRepository.save(new Message(user, "두 번째" , channel));
-        Thread.sleep(10);
+        Thread.sleep(50);
         Message msg3 = messageRepository.save(new Message(user, "세 번째 (커서 기준점)", channel));
 
         PageRequest pageRequest = PageRequest.of(0, 2);
