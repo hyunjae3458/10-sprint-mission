@@ -18,7 +18,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Grant execution Permission
-        uses: chmod +x gradlew
+        run: chmod +x gradlew
 
       - name: Run Test with Gradle
         run: ./gradlew test --no-daemon
