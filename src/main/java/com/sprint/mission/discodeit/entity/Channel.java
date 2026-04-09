@@ -1,39 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.sprint.mission.discodeit.entity.type.ChannelType;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-public class Channel extends BaseEntity{
-    private String channelName;
-    private List<User> participants = new ArrayList<>();
-    private List<Message> channelMessages = new ArrayList<>();
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
+    @Column(name = "channel_name")
+    private String name;
 
-    public String getChannelName() {
-        return channelName;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "channel_type", nullable = false)
+    private ChannelType type;
+
+    @Column(name = "description")
+    private String description;
+
+    public Channel(String channelName, String description) {
+        this.name = channelName;
+        this.description = description;
     }
 
-    public void updateChannelInfo(String newChannelName){
-        this.channelName = newChannelName;
-        super.setUpdatedAt(System.currentTimeMillis());
+    public Channel(String channelName, String description, ChannelType channelType) {
+        this.name = channelName;
+        this.description = description;
+        this.type = channelType;
     }
 
-    public List<User> getParticipants() {
-        return participants;
+    public void updateChannelName(String newChannelName) {
+        this.name = newChannelName;
     }
 
-    public void addParticipant(User user){
-       this.participants.add(user);
-    }
-
-    public List<Message> getChannelMessages() {
-        return channelMessages;
-    }
-
-    public void addMessage(Message message){
-        this.channelMessages.add(message);
-    }
-
-    public Channel(String channelName) {
-        this.channelName = channelName;
+    public void updateChannelDescription(String newDescription){
+        this.description = newDescription;
     }
 }

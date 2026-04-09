@@ -1,62 +1,52 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public class User extends BaseEntity {
+@Getter
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity{
+    @Column(name="username", unique = true, nullable = false)
     private String username;
-    private String password;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    private List<Channel> myChannels = new ArrayList<>();
-    private List<Message> myMessages = new ArrayList<>();
 
-    public String getUsername() {
-        return username;
-    }
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
 
-    public String getPassword() {
-        return password;
-    }
+    @Column(name = "password", nullable = false)
+    private String password;
 
-    public String getEmail() {
-        return email;
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus userStatus;
 
-    public void updateUsername(String newUsername){
-        this.username = newUsername;
-        this.setUpdatedAt(System.currentTimeMillis());
-    }
-
-    public void updateEmail(String newEmail){
-        this.email = newEmail;
-        this.setUpdatedAt(System.currentTimeMillis());
-    }
-
-    public void updatePassword(String newPassword){
-        this.password = newPassword;
-        this.setUpdatedAt(System.currentTimeMillis());
-    }
-
-    public List<Message> getMyMessages() {
-        return myMessages;
-    }
-
-    public List<Channel> getMyChannels() {
-        return myChannels;
-    }
-
-    public void addMessage(Message message){
-        this.myMessages.add(message);
-    }
-
-    public User(String username, String password, String email) {
-        this.username = username;
+    public User(String name, String email, String password){
+        this.username = name;
+        this.email = email;
         this.password = password;
+    }
+
+    public void addProfileImage(BinaryContent profileImg){
+        this.profile = profileImg;
+    }
+
+    public void updateName(String name){this.username = name;}
+
+    public void updateEmail(String email){
         this.email = email;
     }
 
+    public void updateProfileImg(BinaryContent profileImg){this.profile = profileImg;}
+
+    public void updatePassword(String password){this.password = password;}
+
     @Override
     public String toString() {
-        return "이름: " + username + ", 이메일: " + email + ", 비밀번호: " + password;
+        return username;
     }
 }
