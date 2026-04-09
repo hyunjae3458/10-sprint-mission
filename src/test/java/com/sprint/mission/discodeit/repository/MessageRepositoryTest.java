@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.type.ChannelType;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @EnableJpaAuditing
+@Transactional
 class MessageRepositoryTest {
     @Autowired
     MessageRepository messageRepository;
@@ -29,6 +33,8 @@ class MessageRepositoryTest {
     ChannelRepository channelRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    EntityManager em;
 
     @Test
     @DisplayName("채널Id로 조회 시 생성일 순으로 내림차순 정렬했을때 가장 먼저 오는 메시지 조회 반환 성공해야함")
@@ -81,12 +87,23 @@ class MessageRepositoryTest {
 
         // given
         Message msg1 = messageRepository.save(new Message(user, "첫 번째 (가장 오래된)", channel));
-        Thread.sleep(50);
         Message msg2 = messageRepository.save(new Message(user, "두 번째 (커서 기준점)", channel));
-        Thread.sleep(50);
         Message msg3 = messageRepository.save(new Message(user, "세 번째 (가장 최신)", channel));
 
-        Instant cursor = msg2.getCreatedAt();
+        em.flush();
+
+        Instant now = Instant.now();
+        em.createQuery("UPDATE Message m SET m.createdAt = :time WHERE m.id = :id")
+                .setParameter("time", now.minusSeconds(100)).setParameter("id", msg1.getId()).executeUpdate();
+        em.createQuery("UPDATE Message m SET m.createdAt = :time WHERE m.id = :id")
+                .setParameter("time", now.minusSeconds(50)).setParameter("id", msg2.getId()).executeUpdate();
+
+
+        em.flush();
+        em.clear();
+
+        Message dbMsg2 = messageRepository.findById(msg2.getId()).orElseThrow();
+        Instant cursor = dbMsg2.getCreatedAt();
         PageRequest pageRequest = PageRequest.of(0, 10);
 
         // when
@@ -111,15 +128,27 @@ class MessageRepositoryTest {
         User user = userRepository.save(new User("김현재", "fred@naver.com", "1234"));
 
         // given
-        Message msg1 = messageRepository.save(new Message(user, "첫 번째 (hasNext 존재)", channel));
-        Thread.sleep(50);
+        Message msg1 = messageRepository.save(new Message(user, "첫 번째", channel));
         Message msg2 = messageRepository.save(new Message(user, "두 번째", channel));
-        Thread.sleep(50);
         Message msg3 = messageRepository.save(new Message(user, "세 번째", channel));
-        Thread.sleep(50);
-        Message msg4 = messageRepository.save(new Message(user, "네번째 번째 (커서 기준점))", channel));
+        Message msg4 = messageRepository.save(new Message(user, "네 번째", channel));
 
-        Instant cursor = msg4.getCreatedAt();
+        em.flush();
+
+        Instant now = Instant.now();
+        em.createQuery("UPDATE Message m SET m.createdAt = :time WHERE m.id = :id")
+                .setParameter("time", now.minusSeconds(100)).setParameter("id", msg1.getId()).executeUpdate();
+        em.createQuery("UPDATE Message m SET m.createdAt = :time WHERE m.id = :id")
+                .setParameter("time", now.minusSeconds(50)).setParameter("id", msg2.getId()).executeUpdate();
+        em.createQuery("UPDATE Message m SET m.createdAt = :time WHERE m.id = :id")
+                .setParameter("time", now.minusSeconds(10)).setParameter("id", msg3.getId()).executeUpdate();
+
+
+        em.flush();
+        em.clear();
+
+        Message dbMsg4 = messageRepository.findById(msg4.getId()).orElseThrow();
+        Instant cursor = dbMsg4.getCreatedAt();
         PageRequest pageRequest = PageRequest.of(0,2);
 
         // when
