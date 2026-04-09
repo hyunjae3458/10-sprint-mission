@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.List;
@@ -80,11 +81,13 @@ class MessageRepositoryTest {
         User user = userRepository.save(new User("김현재", "fred@naver.com", "1234"));
 
         // given
+        Instant now = Instant.now();
         Message msg1 = messageRepository.save(new Message(user, "첫 번째 (가장 오래된)", channel));
-        Thread.sleep(50);
+        ReflectionTestUtils.setField(msg1, "createdAt", now.minusSeconds(20));
         Message msg2 = messageRepository.save(new Message(user, "두 번째 (커서 기준점)", channel));
-        Thread.sleep(50);
+        ReflectionTestUtils.setField(msg1, "createdAt", now.minusSeconds(10));
         Message msg3 = messageRepository.save(new Message(user, "세 번째 (가장 최신)", channel));
+        messageRepository.saveAll(List.of(msg1,msg2,msg3));
 
         Instant cursor = msg2.getCreatedAt();
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -105,6 +108,7 @@ class MessageRepositoryTest {
     @DisplayName("특정 시간 이전의 메시지들을 최신순으로 커서를 통해 가져오는데 성공하고 다음 메시지가 있으면 hasNext는 true 반환")
     void findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc_hasNext_true() throws InterruptedException{
         // given
+        Instant now = Instant.now();
         Channel channel = new Channel("채널","설명");
         channel.setType(ChannelType.PUBLIC);
         channelRepository.save(channel);
@@ -112,12 +116,13 @@ class MessageRepositoryTest {
 
         // given
         Message msg1 = messageRepository.save(new Message(user, "첫 번째 (hasNext 존재)", channel));
-        Thread.sleep(50);
+        ReflectionTestUtils.setField(msg1, "createdAt", now.minusSeconds(30));
         Message msg2 = messageRepository.save(new Message(user, "두 번째", channel));
-        Thread.sleep(50);
+        ReflectionTestUtils.setField(msg1, "createdAt", now.minusSeconds(20));
         Message msg3 = messageRepository.save(new Message(user, "세 번째", channel));
-        Thread.sleep(50);
+        ReflectionTestUtils.setField(msg1, "createdAt", now.minusSeconds(10));
         Message msg4 = messageRepository.save(new Message(user, "네번째 번째 (커서 기준점))", channel));
+        messageRepository.saveAll(List.of(msg1, msg2, msg3, msg4));
 
         Instant cursor = msg4.getCreatedAt();
         PageRequest pageRequest = PageRequest.of(0,2);
