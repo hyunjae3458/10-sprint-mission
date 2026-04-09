@@ -43,4 +43,4 @@ EXPOSE 80
 # Spring Boot 프로필을 운영(prod)으로 설정
 ENV SPRING_PROFILES_ACTIVE=prod
 # 컨테이너 시작 시 JAR 실행, sh -c 는 환경변수를 쉘환경에서 인식시키기 위해서 추가함
-ENTRYPOINT ["sh","-c","java $JVM_OPTS -jar $PROJECT_NAME-$PROJECT_VERSION.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_TOOL_OPTIONS -jar $PROJECT_NAME-$PROJECT_VERSION.jar"]

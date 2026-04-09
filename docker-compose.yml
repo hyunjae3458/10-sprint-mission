@@ -33,6 +33,7 @@ services:
     container_name: discodeit-app
     restart: always
     environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS}
       # 스프링의 db연결 환경변수
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discodeit
