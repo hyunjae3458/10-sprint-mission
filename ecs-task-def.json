@@ -1,9 +1,21 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:964228719411:task-definition/discodeit-task:14",
+  "family": "discodeit-task",
+  "taskRoleArn": "arn:aws:iam::964228719411:role/discodeit-ecs-task-role",
+  "executionRoleArn": "arn:aws:iam::964228719411:role/discodeit-ecs-execution-role",
+  "networkMode": "bridge",
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
   "containerDefinitions": [
     {
       "name": "discodeit-app",
-      "image": "public.ecr.aws/x1d6e7z4/discodeit:latest",
+      "image": "${ECR_REPOSITORY_URI}:${IMAGE_TAG}",
       "cpu": 256,
       "memory": 512,
       "memoryReservation": 256,
@@ -29,9 +41,6 @@
           "type": "s3"
         }
       ],
-      "mountPoints": [],
-      "volumesFrom": [],
-      "ulimits": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -39,60 +48,8 @@
           "awslogs-create-group": "true",
           "awslogs-region": "ap-northeast-2",
           "awslogs-stream-prefix": "ecs"
-        },
-        "secretOptions": []
-      },
-      "systemControls": []
+        }
+      }
     }
-  ],
-  "family": "discodeit-task",
-  "taskRoleArn": "arn:aws:iam::964228719411:role/discodeit-ecs-task-role",
-  "executionRoleArn": "arn:aws:iam::964228719411:role/discodeit-ecs-execution-role",
-  "networkMode": "bridge",
-  "revision": 14,
-  "volumes": [],
-  "status": "ACTIVE",
-  "requiresAttributes": [
-    {
-      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-    },
-    {
-      "name": "ecs.capability.execution-role-awslogs"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-    },
-    {
-      "name": "ecs.capability.env-files.s3"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.task-iam-role"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-    },
-    {
-      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
-    }
-  ],
-  "placementConstraints": [],
-  "compatibilities": [
-    "EC2"
-  ],
-  "requiresCompatibilities": [
-    "EC2"
-  ],
-  "cpu": "256",
-  "memory": "512",
-  "runtimePlatform": {
-    "cpuArchitecture": "X86_64",
-    "operatingSystemFamily": "LINUX"
-  },
-  "registeredAt": "2026-04-10T04:28:03.916Z",
-  "registeredBy": "arn:aws:iam::964228719411:root",
-  "enableFaultInjection": false,
-  "tags": []
+  ]
 }
