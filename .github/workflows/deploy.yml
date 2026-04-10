@@ -95,3 +95,4 @@ jobs:
             --service ${{ secrets.ECS_SERVICE }} \
             --task-definition ${{ env.NEW_TASK_DEF_ARN }} \
             --desired-count 1
+            --force-new-deployment
