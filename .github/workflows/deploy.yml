@@ -4,7 +4,7 @@ on:
   push:
     branches: ["release"]
 jobs:
-  # Job 1: Docker 이미지 빌드 및 ECR 푸시
+  # [job1]Docker 이미지 빌드 및 ECR 푸시
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Configure AWS Credentials for ECR Public
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -51,32 +51,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 1) 로컬 템플릿(ecs-task-def.json)에 변수 치환하기 (질문자님 코드 적용!)
+      # 로컬 템플릿(ecs-task-def.json)에 변수 치환
       - name: Render task definition with envsubst
         env:
-          # envsubst가 치환할 수 있도록 필요한 변수들을 세팅합니다.
+          # envsubst가 치환할 수 있도록 필요한 변수들을 세팅.
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           IMAGE_TAG: ${{ github.sha }}
           ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
         run: |
-          # 이미 설치된 envsubst를 사용해 파일 내의 ${IMAGE_TAG} 등을 치환합니다.
           envsubst < ecs-task-def.json > task-def.rendered.json
           
           echo "=== Rendered task def 확인 ==="
           cat task-def.rendered.json
 
-      # 2) 치환된 파일로 AWS에 새로운 태스크 정의 등록하기
+      # 치환된 파일로 AWS에 새로운 태스크 정의 등록
       - name: Register new task definition
         id: register_task_definition
         run: |
-          # 등록 후 발급된 새로운 ARN(고유주소)을 가져옵니다.
+          # 등록 후 발급된 새로운 ARN(고유주소)을 가져옴
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
             --cli-input-json file://task-def.rendered.json \
             --query 'taskDefinition.taskDefinitionArn' \
             --output text)
           
-          # 다음 스텝에서 쓸 수 있게 환경변수($GITHUB_ENV)에 저장해둡니다.
+          # 다음 스텝에서 쓸 수 있게 환경변수($GITHUB_ENV)에 저장
           echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
           echo "새로 등록된 ARN: $NEW_TASK_DEF_ARN"
 
