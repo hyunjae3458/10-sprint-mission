@@ -19,7 +19,7 @@ COPY build.gradle settings.gradle ./
 # gradlew 실행 권한 부여
 RUN chmod +x ./gradlew
 # 의존성만 먼저 다운로드하여 캐시 활용 (코드 변경 없이 재사용 가능)
-RUN ./gradlew dependencies--no-daemon
+RUN ./gradlew dependencies --no-daemon
 
 # 로컬의 src를 컨테이너의 현재  디렉토리 안의 폴더 src에 복사
 COPY src ./src
