@@ -75,6 +75,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
             return id;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new FileUploadFailException();
         }
     }
