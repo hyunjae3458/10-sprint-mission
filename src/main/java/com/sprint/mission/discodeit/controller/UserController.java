@@ -34,7 +34,7 @@ public class UserController {
 
     // 유저 생성
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> postUser(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
                                             @Valid @RequestPart("userCreateRequest") UserCreateRequest request,
                                             @RequestPart(value = "profile", required = false)MultipartFile profile){

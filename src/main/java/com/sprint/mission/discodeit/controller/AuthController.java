@@ -6,16 +6,16 @@ import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "인증 관련 API")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService authService;
 
@@ -23,6 +23,14 @@ public class AuthController {
     public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequestDto dto){
         UserDto user = authService.login(dto);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/csrf-token")
+    public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken){
+        String tokenValue = csrfToken.getToken();
+        log.debug("CSRF 토큰 요청: {}", tokenValue);
+
+        return ResponseEntity.status(203).build();
     }
 
 }
