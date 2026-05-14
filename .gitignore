@@ -50,3 +50,5 @@ out/
 
 .env
 discodeit.env
+
+.logs
