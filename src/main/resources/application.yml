@@ -3,3 +3,6 @@ spring:
     name: discodeit
   profiles:
     active: dev
+logging:
+  level:
+    org.springframework.security: TRACE
