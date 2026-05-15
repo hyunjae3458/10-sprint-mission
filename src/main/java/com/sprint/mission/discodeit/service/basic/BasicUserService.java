@@ -126,7 +126,8 @@ public class BasicUserService implements UserService {
         }
         // 비밀번호 수정
         if(request.getNewPassword() != null){
-            user.updatePassword(request.getNewPassword());
+            String newPassword = passwordEncoder.encode(request.getNewPassword());
+            user.updatePassword(newPassword);
         }
         // 프로필 수정(기존에 있던 binaryContent를 삭제하고 업데이트 dto에 있는 binaryContent를 생성
         if(profile != null){
