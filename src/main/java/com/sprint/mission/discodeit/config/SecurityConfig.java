@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.handler.LoginFailureHandler;
+import com.sprint.mission.discodeit.handler.LoginSuccessHandler;
 import com.sprint.mission.discodeit.handler.SpaCsrfTokenRequestHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -12,15 +15,21 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
-
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))
-                .formLogin(Customizer.withDefaults());
+                .formLogin(login -> login
+                        .loginProcessingUrl("/api/auth/login")
+                        .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
+                );
 
         return http.build();
     }
