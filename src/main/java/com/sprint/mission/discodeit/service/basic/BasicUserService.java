@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.authDto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.enums.Role;
 import com.sprint.mission.discodeit.exception.file.FileUploadFailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -45,7 +47,8 @@ public class BasicUserService implements UserService {
         // 유저 객체 생성
         User user = new User(request.getUsername(),
                 request.getEmail(),
-                passwordEncoder.encode(request.getPassword()));
+                passwordEncoder.encode(request.getPassword()),
+                Role.USER);
 
         // 프로필 등록 여부 & binaryContent객체 생성
         if(profile != null){
@@ -147,6 +150,14 @@ public class BasicUserService implements UserService {
         }
         log.info("유저 정보 수정 성공: 유저 id = {}", userId);
         return findUser(userId);
+    }
+
+    @Override
+    @Transactional
+    public UserDto updateRole(UserRoleUpdateRequest request) {
+        User user = getUser(request.getUserId());
+        user.updateRole(request.getNewRole());
+        return userMapper.toDto(user, true);
     }
 
     @Override
