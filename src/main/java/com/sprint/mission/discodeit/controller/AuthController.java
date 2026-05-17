@@ -35,7 +35,7 @@ public class AuthController {
         return ResponseEntity.ok(userDto);
     }
 
-    @PatchMapping("/role")
+    @PutMapping("/role")
     public ResponseEntity<UserDto> updateUserRole(@Valid UserRoleUpdateRequest request){
         UserDto userDto = userService.updateRole(request);
 
